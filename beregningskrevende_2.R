@@ -114,27 +114,7 @@ q
 
 #only beta has a burn in period! kind of
 
+summary(sim_MH)
+2.92*45 + 0.92*(112-45)
+#seems very reasonable!! 
 
-par(mfrow=c(3,1))
-plot(x = seq(1:n), y = sim_MH[1:nrow(sim_MH) ,3], type="l", xlab="Iteration", ylab="x")
-plot(trace2, type="l", xlab="Iteration", ylab="x")
-plot(trace3, type="l", xlab="Iteration", ylab="x")
-
-## show histograms
-
-plot_dist <- function(trace, until, limits){
-  
-  if(until > length(trace)){
-    stop("the trace is not long enough!")
-  }
-  
-  my_x = 0:20
-  my_y = dpois(my_x, lambda=10)
-  tmp <- factor(trace[1:until], levels=0:20)
-  tab <- table(tmp)
-  plot(my_x, my_y, type="b", col=2, xlab="x", ylab="Density", 
-       main=paste("Iteration", until), ylim=limits)
-  lines(0:20, tab/length(tmp), type="h", cex=1.2)
-}
-
-trace1 <- simMC_pois10_mcmc(5000, x_start = 0)
