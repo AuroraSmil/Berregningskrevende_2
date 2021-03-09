@@ -8,21 +8,12 @@ f_cond_beta <- function(beta, lambda_0, lambda_1){
   return(exp(-1/beta * (lambda_0 + lambda_1 + 1))*(1/beta)^5)
 }
 
+f_cond_t <- function(beta, lambda_0, lambda_1, y_0, y_1){
+  return(lambda_0^y_0 *lambda_1^y_1*exp(-t* (lambda_0 - lambda_1 )))
+}
+
 MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
-  
-   t = 45
-  # y_0 = sum(data[date <t]$event)
-  # y_1 = sum(data[date>= t]$event)
-  # lambda_0 <- y_0/t
-  # lambda_1 <- y_1/(190-t)
-  # beta = 1
-  # 
-  # n = 100
-  # t_0 = 0 #1851
-  # t_2 = 1963- 1851 #maybe should be 1963? 
-  # sigma = 1
-  
-  
+
   y_0 = sum(data[date <t]$event)
   y_1 = sum(data[date>= t]$event)
   y_0
@@ -37,29 +28,30 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
     y_1 = sum(data[date>= results[i-1,1]]$event)
     #print(i)
     #gibs step
-    #t <- rexp(1, 1/(lambda_0 - lambda_1)) #must be wrong! 
+    
     lambda_0 <- rgamma(1, (y_0 + 1), scale= (1/(t - t_0 + 1/beta)))
     lambda_1 <- rgamma(1, (y_1 + 1), scale=(1/(t_2 - t + 1/beta)))
     lambda_0
     lambda_1
-
-    results[i, 1:3] <- c(t, lambda_0, lambda_1)
+    beta_tilde <- rgamma(1, 6, scale = 1/(lambda_0 + lambda_1 + 1))
+    beta <- 1/beta_tilde
+    beta
+    results[i, 2:4] <- c( lambda_0, lambda_1, beta)
     
     #MH step
-    beta_old <- results[i-1, 4]
-    beta_new <- rnorm(1, beta_old, sigma)
-    beta_old
-    beta_new
-    ## acceptannce prob
     
-    a <- min(1, f_cond_beta(beta_new, lambda_0 , lambda_1)/f_cond_beta(beta_old, lambda_0 , lambda_1))
+    t_old <- results[i-1, 1]
+    t_new <- rnorm(1, t_old, sigma)
+    t_new
+    ## acceptannce prob
+    a <- min(1, (lambda_0^y_0 *lambda_1^y_1*exp(-t_new *(lambda_0 - lambda_1 )))/(lambda_0^y_0 *lambda_1^y_1*exp(-t_old *(lambda_0 - lambda_1 ))))
     a
     u <- runif(1)
     u
     if (u< a){
-      results[i, 4] <-  beta_new
+      results[i, 1] <-  t_new
     } else{
-      results[i,4] <- beta_old
+      results[i,1] <- t_old
       }
   }
   return (results)
@@ -107,11 +99,15 @@ sim_MH
 q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
 q
+q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
 q
+q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "beta"))
 q
-
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = t, colour = "t"))
+q
 #only beta has a burn in period! kind of
 
 summary(sim_MH)
