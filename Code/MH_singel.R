@@ -4,9 +4,9 @@
 # Want Q to be a random walk
 
 
-f_cond_beta <- function(beta, lambda_0, lambda_1){
-  return(exp(-1/beta * (lambda_0 + lambda_1 + 1))*(1/beta)^5)
-}
+# f_cond_beta <- function(beta, lambda_0, lambda_1){
+#   return(exp(-1/beta * (lambda_0 + lambda_1 + 1))*(1/beta)^5)
+# }
 
 f_cond_t <- function(beta, lambda_0, lambda_1, y_0, y_1){
   return(lambda_0^y_0 *lambda_1^y_1*exp(-t* (lambda_0 - lambda_1 )))
@@ -98,7 +98,7 @@ q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
 q
 q <- ggplot(data = sim_MH, aes(x = itteration) )
-q <- q + geom_line(aes(y = lambda_1, colour = "beta"))
+q <- q + geom_line(aes(y = beta, colour = "beta"))
 q
 q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))

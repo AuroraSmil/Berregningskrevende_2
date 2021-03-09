@@ -86,6 +86,11 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
       t_old
       beta_old <- results[i-1, 4]
       beta_new <- rnorm(1, beta_old, sigma)
+      beta_new
+      print("t")
+      print(t_old)
+      print("beta")
+      print(beta_new)
       
       lambda_0 <- rgamma(1, (y_0 + 1), scale= (1/(t_old - t_0 + 1/beta_new)))
       lambda_1 <- rgamma(1, (y_1 + 1), scale=(1/(t_2 - t_old + 1/beta_new)))
@@ -120,9 +125,9 @@ t = 45
 
 lambda_0 <- 135/50
 lambda_1 <- 56/50
-beta = 10
+beta = 1
 
-n = 10000
+n = 1000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
 sigma = 3
@@ -130,7 +135,6 @@ sigma = 3
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma)
 
 sim_MH <- as.data.table(sim_MH)
-sim_MH
 
 setnames(sim_MH, c("t", "lambda_0", "lambda_1", "beta"))
 
@@ -140,9 +144,14 @@ sim_MH
 q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
 q
+q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
 q
-q <- q + geom_line(aes(y = lambda_1, colour = "beta"))
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = beta, colour = "beta"))
+q
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = t, colour = "t"))
 q
 
 #only beta has a burn in period! kind of
