@@ -29,8 +29,8 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
     #print(i)
     #gibs step
     
-    lambda_0 <- rgamma(1, (y_0 ), scale= (1/(t - t_0 + 1/beta)))
-    lambda_1 <- rgamma(1, (y_1 ), scale=(1/(t_2 - t + 1/beta)))
+    lambda_0 <- rgamma(1, (y_0 + 2 ), scale= (1/(t - t_0 + 1/beta))) #stemmer shape param?
+    lambda_1 <- rgamma(1, (y_1 + 2 ), scale=(1/(t_2 - t + 1/beta))) #stemmer shape param?
     lambda_0
     lambda_1
     beta_tilde <- rgamma(1, 6, scale = 1/(lambda_0 + lambda_1 + 1))
@@ -44,7 +44,7 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
     t_new <- rnorm(1, t_old, sigma)
     t_new
     ## acceptannce prob
-    a <- min(1, (lambda_0^y_0 *lambda_1^y_1*exp(-t_new *(lambda_0 - lambda_1 )))/(lambda_0^y_0 *lambda_1^y_1*exp(-t_old *(lambda_0 - lambda_1 ))))
+    a <- min(1, (lambda_0^{y_0+1} *lambda_1^{y_1+1}*exp(-t_new *(lambda_0 - lambda_1 )))/(lambda_0^{y_0+1} *lambda_1^{y_1+1}*exp(-t_old *(lambda_0 - lambda_1 ))))
     a
     u <- runif(1)
     u
