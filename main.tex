@@ -16,24 +16,18 @@
 % Inserting table of contents
 \tableofcontents
 
-% Inserting list of figures & list of tables
-\listoffigures
-\listoftables
 
 % Defining main matter settings (Norsk: innstillinger for hoveddelen av teksten)
 \mainmatter
 
 % Introduction explaining this LaTeX-template
-\inpu{./Sections/}{ex_1}
+\input{Sections/A}
 
 
 % Printing bibliography
 \newpage
 \printbibliography[heading = bibintoc, title = Bibliography]    % 'bibintoc' inserts our bibliography into the table of contents
 
-% Inserting appendix with separate settings
-\addappendix
-\import{./Appendices/}{example_appendix}
 
 % End of document
 \end{document}
