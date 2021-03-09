@@ -17,18 +17,36 @@ f_cond_beta <- function(beta, lambda_0, lambda_1){
 
 
 f_target_1 <- function(lambda_0, lambda_1, t, t_0, t_2, beta, y_0, y_1){
+  if(t<t_0){
+    return (0)
+  }
+  if(t> t_2){
+    return (0)
+  }
   return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
 }
 
 f_prop_1 <- function(lambda_0, lambda_1, t, t_0, t_2, beta, y_0, y_1){
+  if(t<t_0){
+    return (0)
+  }
+  if(t> t_2){
+    return (0)
+  }
   return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
 }
 
 f_target_2 <- function(lambda_0, lambda_1, beta, t_0, t_2, t, y_0, y_1){
+  if(beta<0){
+    return (0)
+  }
   return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1+1))*lambda_0^y_0*lambda_1^y_1)*(1/beta^5)
 }
 
 f_prop_2 <- function(lambda_0, lambda_1, t, t_0, t_2, beta, y_0, y_1){
+  if(beta<0){
+    return (0)
+  }
   return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
 }
 
@@ -48,69 +66,80 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
       t_old
       t_new <- rnorm(1, t_old, sigma)
       t_new
-      beta_old <- results[i-1, 4]
+      beta <- results[i-1, 4]
+      beta
       #print("t")
       #print(results[i-1,1])
-      y_0 = sum(data[date <results[i-1,1]]$event)
-      y_1 = sum(data[date>= results[i-1,1]]$event)
+      y_0_old = sum(data[date <results[i-1,1]]$event)
+      y_1_old = sum(data[date>= results[i-1,1]]$event)
+      y_0_n = sum(data[date <t_new]$event)
+      y_1_n = sum(data[date>= t_new]$event)
       #print(i)
       #gibs step
       #t <- rexp(1, 1/(lambda_0 - lambda_1)) #must be wrong! 
-      lambda_0 <- rgamma(1, (y_0 + 1), scale= (1/(t_new - t_0 + 1/beta_old)))
-      print("scale")
-      print(1/(t_new - t_0 + 1/beta_old))
-      print("t")
-      print(t_new)
-      print("beta")
-      print(beta_old)
+      lambda_0_old <- results[i-1, 2]
+      lambda_1_old <- results[i-1, 3]
+      lambda_0 <- rgamma(1, (y_0 ), scale= (1/(t_new - t_0 + 1/beta_old)))
+       print("scale")
+       print(1/(t_new - t_0 + 1/beta_old))
+      # print("t")
+      # print(t_new)
+       print("beta")
+       print(beta_old)
       lambda_1 <- rgamma(1, (y_1 + 1), scale=(1/(t_2 - t_new + 1/beta_old)))
-      print(lambda_0)
-      print(lambda_1)
+      # print(lambda_0)
+      # print(lambda_1)
       
-      target_ratio <-  f_target_2(lambda_0, lambda_1, beta_new, t_0, t_2, t_old, y_0, y_1)/f_target_2(results[i-1, 2], results[i-1, 3], beta_old, t_0, t_2, t_old, y_0, y_1)
+      target_ratio <-  f_target_1(lambda_0, lambda_1, t_new, t_0, t_2, beta, y_0_n, y_1_n)/
+        f_target_2(lambda_0_old, lambda_1_old, t_old, t_0, t_2, beta_old, y_0, y_1)
       target_ratio
-      prop_ratio <- f_prop_1(lambda_0, lambda_1, t_new, t_0, t_2, beta_old, y_0, y_1)/f_prop_1(results[i-1, 2], results[i-1, 3], t_old, t_0, t_2, beta_old, y_0, y_1)
+      prop_ratio <- f_prop_1(lambda_0_old, lambda_1_old, t_new, t_0, t_2, beta, y_0_n, y_1_n)/f_prop_1(lambda_0, lambda_1, t_old, t_0, t_2, beta, y_0, y_1)
       prop_ratio
       a <- target_ratio*prop_ratio
+      a
+      a <- min(1, a)
       a
       u <- runif(1)
       u
       if (u< a){
-        results[i, 1:4] <- c(t_new, lambda_0, lambda_1, beta_old)
+        results[i, 1:4] <- c(t_new, lambda_0, lambda_1, beta)
       } else{
-        results[i,1:4] <- c(t_old, results[i-1, 2], results[i-1, 3], beta_old)
+        results[i,1:4] <- c(t_old, lambda_0_old, lambda_1_old, beta)
       }
     }
     else{
-      t_old <- results[i-1, 1]
-      t_old
+      t <- results[i-1, 1]
+      t
       beta_old <- results[i-1, 4]
       beta_new <- rnorm(1, beta_old, sigma)
       beta_new
       print("t")
-      print(t_old)
-      print("beta")
-      print(beta_new)
+      print(t)
+       print("beta")
+       print(beta_new)
       
-      lambda_0 <- rgamma(1, (y_0 + 1), scale= (1/(t_old - t_0 + 1/beta_new)))
-      lambda_1 <- rgamma(1, (y_1 + 1), scale=(1/(t_2 - t_old + 1/beta_new)))
+      lambda_0_n <- rgamma(1, (y_0 + 1), scale= (1/(t_old - t_0 + 1/beta_new)))
+      lambda_1_n <- rgamma(1, (y_1 + 1), scale=(1/(t_2 - t_old + 1/beta_new)))
       lambda_0
       lambda_1
-      print(lambda_0)
-      print(lambda_1)
+      # print(lambda_0)
+      # print(lambda_1)
       
-      target_ratio <-  f_target_2(lambda_0, lambda_1, t_new, t_0, t_2, beta_old, y_0, y_1)/f_target_1(results[i-1, 2], results[i-1, 3], t_old, t_0, t_2, beta_old, y_0, y_1)
+      lambda_0_old <- results[i-1, 2]
+      lambda_1_old <- results[i-1, 3]
+      
+      target_ratio <-  f_target_2(lambda_0, lambda_1, beta_new, t_0, t_2, t, y_0, y_1)/f_target_2(results[i-1, 2], results[i-1, 3], beta_old, t_0, t_2, t, y_0, y_1)
       target_ratio
-      prop_ratio <- f_prop_2(lambda_0, lambda_1, t_old, t_0, t_2, beta_new, y_0, y_1)/f_prop_2(results[i-1, 2], results[i-1, 3], t_old, t_0, t_2, beta_old, y_0, y_1)
+      prop_ratio <- f_prop_2(lambda_0_old, lambda_1_old, beta_new, t_0, t_2, t, y_0, y_1)/f_prop_2(lambda_0, lambda_1, beta_old, t_0, t_2, t, y_0, y_1)
       prop_ratio
-      a <- target_ratio*prop_ratio
+      a <- min(1, target_ratio*prop_ratio)
       a
       u <- runif(1)
       u
       if (u< a){
-        results[i, 1:4] <- c(t_new, lambda_0, lambda_1, beta_old)
+        results[i, 1:4] <- c(t, lambda_0, lambda_1, beta_new)
       } else{
-        results[i,1:4] <- c(t_old, results[i-1, 2], results[i-1, 3], beta_old)
+        results[i,1:4] <- c(t, lambda_0_old, lambda_1_old, beta_old)
       }
       
     }
@@ -125,9 +154,9 @@ t = 45
 
 lambda_0 <- 135/50
 lambda_1 <- 56/50
-beta = 1
+beta = 10
 
-n = 1000
+n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
 sigma = 3
