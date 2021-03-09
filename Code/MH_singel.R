@@ -72,10 +72,6 @@ q <- q + geom_line()
 q
 
 t = 45
-# data_aggregated <- data.table(
-#   y_0 = sum(data[date <t]$event),
-#   y_1 = sum(data[date>= t]$event)
-# )
 
 lambda_0 <- 10 #135/50
 lambda_1 <- 5 #56/50
@@ -89,7 +85,6 @@ sigma = 3
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma)
 
 sim_MH <- as.data.table(sim_MH)
-sim_MH
 
 setnames(sim_MH, c("t", "lambda_0", "lambda_1", "beta"))
 
