@@ -47,8 +47,8 @@ pi_theta_cond <- function(T){
   return ( rgamma(T/2, scale= 2/3))
 }
 
-pi_theta_cond <- function(T){
-  return ( rgamma(1, shape = ( (T-2)/T +1), scale= 2/3))
+pi_theta_cond <- function(T, eta, Q){
+  return ( rgamma(1, shape = ( (T/2-2)), scale= 1/(t(eta)%*% Q%*% eta)))
 }
 
 Q <-as.matrix( make_Q(20))
@@ -68,14 +68,14 @@ Gibbs_alg <- function(n ,data){
   I <- diag(nrow = 20, ncol = 20)
   y <- data$value
   
-  theta_0 <- pi_theta_cond(T)
+  theta_0 <- 1# pi_theta_cond(T)
   eta_0 <- pi_eta_full_cond(Q*theta_0, I, y)
   
   results <- matrix(nrow = n, ncol = 21)
   results[1, 1:21] <- c(theta_0, eta_0)
   
   for(i in 2:n){
-    theta <- pi_theta_cond(T)
+    theta <- pi_theta_cond(T, eta, Q)
     eta <- pi_eta_full_cond(Q, I, y)
     results[i, 1:21] <- c(theta, eta)
   }
@@ -136,14 +136,13 @@ I <- diag(nrow = 20, ncol = 20)
 y <- data$value
 eta <- pi_eta_full_cond(Q*1, I, y)
 n = 100
-theta_grid <- (seq(0.00001, 6, length.out = n))
+theta_grid <- (seq(0.00001, 2, length.out = n))
 #theta =  pi_theta_given_y(theta_grid[1], Q, I, y, eta)
 
 post_theta <- (lapply(seq(0.00001, 6, length.out = n), pi_theta_given_y, Q, I, y, eta))
 
 
 require(purrr)
-L <- list(1:4, c(7,9,1,4), c(8,2,1), c(8,9,0,7))
 data_post <- map_df(post_theta, ~as.data.frame(t(.)))
 data_post <- as.data.table(data_post)
 setnames(data_post, c("V1", "V2"), c("post_theta", "eta_full"))
@@ -153,7 +152,7 @@ data_post[, x := theta_grid]
 
 
 q <- ggplot(data = as.data.table(data_post))
-q <- q + geom_point(aes(x =x, y = y ))
+q <- q + geom_point(aes(x =x, y = post_theta ))
 q
 
 ###### last inla step
