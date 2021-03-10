@@ -48,20 +48,22 @@ f_target_2 <- function(lambda_0, lambda_1, beta, t_0, t_2, t, y_0, y_1){
 }
 
 f_prop_2 <- function(lambda_0, lambda_1, t, t_0, t_2, beta_cur, beta_given, y_0, y_1, sigma_beta){
-  if(beta_cur<0){
-    retval <- 0
-  } else if (beta_given<0){
-    retval <- 0
-  } else{
     print("beta_prop")
     print(beta_cur)
     #return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
     # print((1/(t - t_0 + 1/beta_cur)))
     # print(1/(t_2 - t + 1/beta_cur))
-    retval <- dgamma(lambda_0, (y_0 ), scale= (1/(t - t_0 + 1/beta_cur)))*dgamma(lambda_1, (y_1 ), scale= (1/(t_2 - t + 1/beta_cur)))*dnorm(beta_cur, beta_given,sigma_beta)
-  }
+    print("scale_prop")
+    print(1/(t - t_0 + 1/beta_cur))
+    print(1/(t_2 - t + 1/beta_cur))
+    print("lambda")
+    print(lambda_0)
+    print(lambda_1)
+    retval <- dgamma(lambda_0, (y_0 ), scale= (1/(t - t_0 + 1/beta_cur)))*
+        dgamma(lambda_1, (y_1), scale= (1/(t_2 - t + 1/beta_cur)))*
+        dnorm(beta_cur, beta_given, sigma_beta)
 
-  print("retval prop_ratio")
+  print("retval prop")
   print(retval)
   return (retval)
 }
@@ -74,7 +76,7 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
   y_0
   y_1
   results <- matrix(nrow = n, ncol = 5)
-  results[1, 1:5] <- c(t, lambda_0, lambda_1, beta, a)
+  results[1, 1:5] <- c(t, lambda_0, lambda_1, beta, 1)
   for(i in 2:(n)){
     print(i)
     if(i %% 2 == 0){
@@ -141,7 +143,8 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
       
       #WHEN EW DO AS IN THE EXERCISE THINGS CRASH
       
-      #beta_new <- rnorm(1, beta_old, sigma_beta)
+      #beta_new <- rnorm(1, mean = beta_old, sd = sigma_beta)
+      
       y_0 = sum(data[date <results[i-1,1]]$event)
       y_1 = sum(data[date>= results[i-1,1]]$event)
       if(beta_new< 0){
@@ -175,6 +178,9 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
         #   f_prop_2(lambda_0, lambda_1, beta_cur = beta_new, beta_given = beta_old, t_0 = t_0, t_2 = t_2, t = t, y_0, y_1, sigma_beta = sigma_beta)
         # prop_ratio
         
+        
+        
+        
         prop_ratio <- (dgamma(lambda_0_old, (y_0 ), scale= (1/(t - t_0 + 1/beta_old)))*
           dgamma(lambda_1_old, (y_1), scale= (1/(t_2 - t + 1/beta_old)))*
           dgamma(beta_old,  6, scale = 1/(lambda_0_old + lambda_1_old + 1)))/
@@ -206,10 +212,10 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
 
 
 
-t = 37
+t =45
 
-lambda_0 <- 6#135/50
-lambda_1 <- 3# 56/50
+lambda_0 <- 135/50
+lambda_1 <-  56/50
 beta = 3
 
 n = 10000
