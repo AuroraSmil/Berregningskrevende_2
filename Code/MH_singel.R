@@ -109,3 +109,11 @@ summary(sim_MH)
 2.92*45 + 0.92*(112-45)
 #seems very reasonable!! 
 
+
+##Looking at the acf of t
+
+burnin <- 1000
+
+sim_t <- sim_MH$t[burnin:n]
+
+acf(sim_t)
