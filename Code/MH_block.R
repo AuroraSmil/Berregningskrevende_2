@@ -33,7 +33,7 @@ f_prop_1 <- function(lambda_0, lambda_1, t_given, t_cur, t_0, t_2, beta, y_0, y_
   #return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
   
   
-  retval <- dgamma(lambda_0, (y_0 ), scale= (1/(t_cur - t_0 + 1/beta)))*dgamma(lambda_1, (y_1 ), scale= (1/(t_2 - t_cur + 1/beta)))*dnorm(t, t_given,sigma_t)
+  retval <- dgamma(lambda_0, (y_0 +2), scale= (1/(t_cur - t_0 + 1/beta)))*dgamma(lambda_1, (y_1 +2), scale= (1/(t_2 - t_cur + 1/beta)))*dnorm(t, t_given,sigma_t)
   print("retval_prop")
   print(retval)
 }
@@ -59,8 +59,8 @@ f_prop_2 <- function(lambda_0, lambda_1, t, t_0, t_2, beta_cur, beta_given, y_0,
     print("lambda")
     print(lambda_0)
     print(lambda_1)
-    retval <- dgamma(lambda_0, (y_0 ), scale= (1/(t - t_0 + 1/beta_cur)))*
-        dgamma(lambda_1, (y_1), scale= (1/(t_2 - t + 1/beta_cur)))*
+    retval <- dgamma(lambda_0, (y_0 +2), scale= (1/(t - t_0 + 1/beta_cur)))*
+        dgamma(lambda_1, (y_1+2), scale= (1/(t_2 - t + 1/beta_cur)))*
         dnorm(beta_cur, beta_given, sigma_beta)
 
   print("retval prop")
@@ -102,14 +102,14 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
         #t <- rexp(1, 1/(lambda_0 - lambda_1)) #must be wrong! 
         lambda_0_old <- results[i-1, 2]
         lambda_1_old <- results[i-1, 3]
-        lambda_0 <- rgamma(1, (y_0 ), scale= (1/(t_new - t_0 + 1/beta)))
+        lambda_0 <- rgamma(1, (y_0 +2), scale= (1/(t_new - t_0 + 1/beta)))
          print("scale")
          print(1/(t_new - t_0 + 1/beta))
         # print("t")
         # print(t_new)
          print("beta")
          print(beta)
-        lambda_1 <- rgamma(1, (y_1), scale=(1/(t_2 - t_new + 1/beta)))
+        lambda_1 <- rgamma(1, (y_1+2), scale=(1/(t_2 - t_new + 1/beta)))
         # print(lambda_0)
         # print(lambda_1)
         
@@ -141,7 +141,7 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
       
       beta_new <-  rgamma(1, 6, scale = 1/(lambda_0 + lambda_1 + 1)) 
       
-      #WHEN EW DO AS IN THE EXERCISE THINGS CRASH
+      #WHEN WE DO AS IN THE EXERCISE THINGS CRASH
       
       #beta_new <- rnorm(1, mean = beta_old, sd = sigma_beta)
       
@@ -158,8 +158,8 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
         print(beta_new)
 
         
-        lambda_0_n <- rgamma(1, (y_0 ), scale= (1/(t_old - t_0 + 1/beta_new)))
-        lambda_1_n <- rgamma(1, (y_1), scale=(1/(t_2 - t_old + 1/beta_new)))
+        lambda_0_n <- rgamma(1, (y_0 + 2), scale= (1/(t_old - t_0 + 1/beta_new)))
+        lambda_1_n <- rgamma(1, (y_1 + 2), scale=(1/(t_2 - t_old + 1/beta_new)))
         lambda_0_n
         lambda_1_n
         # print(lambda_0)
@@ -174,19 +174,18 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
         
         # THIS ONE RETURNS 0 AND MAKES EVERYTHING CRASH
         
-        # prop_ratio <- f_prop_2(lambda_0_old, lambda_1_old, beta_cur = beta_old, beta_given = beta_new, t = t, t_0 = t_0, t_2 = t_2, y_0, y_1, sigma_beta = sigma_beta)/
-        #   f_prop_2(lambda_0, lambda_1, beta_cur = beta_new, beta_given = beta_old, t_0 = t_0, t_2 = t_2, t = t, y_0, y_1, sigma_beta = sigma_beta)
-        # prop_ratio
+        prop_ratio <- f_prop_2(lambda_0_old, lambda_1_old, beta_cur = beta_old, beta_given = beta_new, t = t, t_0 = t_0, t_2 = t_2, y_0, y_1, sigma_beta = sigma_beta)/
+          f_prop_2(lambda_0, lambda_1, beta_cur = beta_new, beta_given = beta_old, t_0 = t_0, t_2 = t_2, t = t, y_0, y_1, sigma_beta = sigma_beta)
+        prop_ratio
         
         
         
-        
-        prop_ratio <- (dgamma(lambda_0_old, (y_0 ), scale= (1/(t - t_0 + 1/beta_old)))*
-          dgamma(lambda_1_old, (y_1), scale= (1/(t_2 - t + 1/beta_old)))*
-          dgamma(beta_old,  6, scale = 1/(lambda_0_old + lambda_1_old + 1)))/
-          (dgamma(lambda_0_n, (y_0 ), scale= (1/(t - t_0 + 1/beta_new)))*
-          dgamma(lambda_1_n, (y_1 ), scale= (1/(t_2 - t+ 1/beta_new)))*
-          dgamma(beta_new,  6, scale = 1/(lambda_0_n + lambda_1_n + 1)))
+        # prop_ratio <- (dgamma(lambda_0_old, (y_0 +2), scale= (1/(t - t_0 + 1/beta_old)))*
+        #   dgamma(lambda_1_old, (y_1+2), scale= (1/(t_2 - t + 1/beta_old)))*
+        #   dgamma(beta_old,  6, scale = 1/(lambda_0_old + lambda_1_old + 1)))/
+        #   (dgamma(lambda_0_n, (y_0 +2 ), scale= (1/(t - t_0 + 1/beta_new)))*
+        #   dgamma(lambda_1_n, (y_1 +2 ), scale= (1/(t_2 - t+ 1/beta_new)))*
+        #   dgamma(beta_new,  6, scale = 1/(lambda_0_n + lambda_1_n + 1)))
 
         
         #print(target_ratio)
@@ -221,7 +220,7 @@ beta = 3
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma_t = 5
+sigma_t = 3
 sigma_beta = 0.1
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma_t = sigma_t, sigma_beta = sigma_beta)
@@ -245,6 +244,7 @@ q
 q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
 q
+
 
 #only beta has a burn in period! kind of
 
