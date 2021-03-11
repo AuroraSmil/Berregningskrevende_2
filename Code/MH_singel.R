@@ -43,6 +43,7 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
     t_old <- results[i-1, 1]
     t_new <- rnorm(1, t_old, sigma)
     t_new
+    #print(c("T_old", t_old, "T_new", t_new))
     ## acceptannce prob
     a <- min(1, (lambda_0^{y_0+1} *lambda_1^{y_1+1}*exp(-t_new *(lambda_0 - lambda_1 )))/(lambda_0^{y_0+1} *lambda_1^{y_1+1}*exp(-t_old *(lambda_0 - lambda_1 ))))
     a
@@ -80,7 +81,8 @@ beta = 10
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma = 3
+
+sigma = 0.3
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma)
 
