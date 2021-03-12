@@ -20,7 +20,7 @@ f_target_1 <- function(lambda_0, lambda_1, t, t_0, t_2, beta, y_0, y_1){
   if(t> t_2){
     return (0)
   }
-  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^{y_0+ 1}*lambda_1^{y_1+1})
+  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- (1/beta)*(lambda_0 + lambda_1))*lambda_0^{y_0+ 1}*lambda_1^{y_1+1})
 }
 
 f_prop_1 <- function(lambda_0, lambda_1, t_given, t_cur, t_0, t_2, beta, y_0, y_1, sigma_t){
@@ -44,7 +44,7 @@ f_target_2 <- function(lambda_0, lambda_1, beta, t_0, t_2, t, y_0, y_1){
   }
   print("beta_target")
   print(beta)
-  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1+1))*lambda_0^{y_0+ 1}*lambda_1^{y_1+1})*(1/beta^5)
+  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- (1/beta)*(lambda_0 + lambda_1+1))*lambda_0^{y_0+ 1}*lambda_1^{y_1+1})*(1/beta^5)
 }
 
 f_prop_2 <- function(lambda_0, lambda_1, t, t_0, t_2, beta_cur, beta_given, y_0, y_1, sigma_beta){
