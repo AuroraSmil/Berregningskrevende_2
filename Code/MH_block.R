@@ -32,10 +32,10 @@ f_prop_1 <- function(lambda_0, lambda_1, t_given, t_cur, t_0, t_2, beta, y_0, y_
   }
   #return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
   
-  
   retval <- dgamma(lambda_0, (y_0 +2), scale= (1/(t_cur - t_0 + 1/beta)))*dgamma(lambda_1, (y_1 +2), scale= (1/(t_2 - t_cur + 1/beta)))*dnorm(t, t_given,sigma_t)
-  print("retval_prop")
-  print(retval)
+  #print("retval_prop")
+  #print(retval)
+  return(retval)
 }
 
 f_target_2 <- function(lambda_0, lambda_1, beta, t_0, t_2, t, y_0, y_1){
