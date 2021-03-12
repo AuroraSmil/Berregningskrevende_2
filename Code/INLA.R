@@ -4,25 +4,21 @@ library(Matrix)
 library(MASS)
 library(mvtnorm)
 
-#importing data
+# Importing data
 data <- as.data.table(read.delim("code/Gaussiandata.txt", header = FALSE))
-data
 data[, t := seq(1:nrow(data))]
-data
-
 setnames(data, "V1", "value")
-data
+head(data)
 
+# Plot the data
 q <- ggplot(data, aes(t, value))
 q <- q + geom_point()
 q
 
-q <- ggplot(data, aes(x = value))
-q <- q + geom_histogram(aes(y = ..density..), bins = 50 )
-q
-
+#Define T = number of events
 T = 20
 
+#Make precision matrix
 make_Q <- function(T){
   if (T <3){
     return("Dimention to low")
@@ -45,18 +41,12 @@ make_Q <- function(T){
   return(M)
 }
 
-# pi_theta_cond <- function(T){
-#   return ( rgamma(T/2, scale= 2/3))
-# }
-
+# Define full conditional for theta
 pi_theta_cond <- function(T, eta, Q){
   return ( rgamma(1, shape = ( (T/2 )), scale= 1/(1 + (t(eta)%*% Q%*% eta)*0.5)))
-} # missing theta and
+}
 
-Q <-as.matrix( make_Q(20))
-I <- diag(nrow = 20, ncol = 20)
-y <- data$value
-
+#Define full conditional for eta
 pi_eta_full_cond <- function(Q, I ,  y){
   mu <- solve((I + Q))%*%y
   sigma <- solve(I + Q)
@@ -64,14 +54,20 @@ pi_eta_full_cond <- function(Q, I ,  y){
   return (retval)
 }
 
+# Collect Q, I and y
+Q <-as.matrix( make_Q(20))
+I <- diag(nrow = 20, ncol = 20)
+y <- data$value
 
+# Define the gibbs algorithm
 Gibbs_alg <- function(n ,data){
   T = 20
   Q <-as.matrix( make_Q(20))
   I <- diag(nrow = 20, ncol = 20)
   y <- data$value
   
-  theta <-  0#1 #pi_theta_cond(T)
+  #Define initial values for theta and eta
+  theta <-  0
   eta <-  pi_eta_full_cond(Q*(theta), I, y)
   
   results <- matrix(nrow = n, ncol = 21)
@@ -86,18 +82,19 @@ Gibbs_alg <- function(n ,data){
   return (results)
 }
 
+#Run algorithm
 n = 100000
-
 posterior_dist_MC <- Gibbs_alg(n, data)
 summary(posterior_dist_MC)
 
-
-posterior_dist_MC_usefull <- posterior_dist_MC[25000:nrow(posterior_dist_MC), ]
-
+# Discard burn in period
+posterior_dist_MC_usefull <- posterior_dist_MC[5000:nrow(posterior_dist_MC), ]
 posterior_dist_MC_usefull <- as.data.table(posterior_dist_MC_usefull)
 posterior_dist_MC_usefull[, itteration:= 1:nrow(posterior_dist_MC_usefull)]
 
-q <- ggplot(data = post_data_MC, aes(x = itteration) )
+summary(posterior_dist_MC_usefull)
+
+q <- ggplot(data = as.data.table(posterior_dist_MC), aes(x = 1:n) )
 q <- q + geom_line(aes(y = V1))
 q
 
@@ -111,38 +108,20 @@ q <- ggplot(posterior_dist_MC_usefull, aes(x = V11))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q
 
-pi_eta_given_theta<- function(Q, I ,  y){
-  mu <- as.matrix(rep(0, 20))
-  sigma <- solve(Q)
-  retval <- mvrnorm(n = 1, mu, sigma, tol = 1e-6, empirical = FALSE, EISPACK = FALSE)
-  return (retval)
-}
-
 
 #INLA scheme #################
 
-#just pick a value for eta? 
+## First inla step
 
-
-
+# pi(theta|y)
 pi_theta_given_y <- function(theta, Q, I, y, eta){
-  #d_theta <- dgamma(theta, 1,1)
-  #print(d_theta)
-
-  #sigma_1 <- solve(Q*theta + diag(0.0000001, 20, 20)) #small pertiibaitn to awoid singularity
-  #mu_1 <- as.matrix(rep(0, 20))
-  #eta_given_theta <- dmvnorm(x = eta, mean = mu_1, sigma = sigma_1)
-  
-  #eta_theta <- dgamma(theta, 1, 1/(1 + 0.5*t(eta)%*%Q%*%eta))
   eta_theta <- theta^((T-2)/2)*exp(-theta - 0.5*theta*t(eta)%*%Q%*%eta)
-  #print(eta_given_theta)
   likelihood <- dmvnorm(x = y, mean = eta, sigma = diag(1, nrow= T, ncol= T))
   print(likelihood)
   mu_2 <- solve((Q*theta+ I))%*%y
   sigma_2 <- solve(Q*theta+ I)
   pi_eta_full <- dmvnorm(eta, mu_2, sigma_2)
   print(pi_eta_full)
-  #retval <- c(((d_theta*eta_given_theta*likelihood)/pi_eta_full), pi_eta_full)
   retval <- c(eta_theta*likelihood/pi_eta_full, pi_eta_full)
   return(retval)
 }
@@ -154,10 +133,11 @@ retval <- mvrnorm(n = 1, mu, sigma, tol = 1e-6, empirical = FALSE, EISPACK = FAL
 Q <-as.matrix( make_Q(20))
 I <- diag(nrow = 20, ncol = 20)
 y <- data$value
+
+#Pick random eta
 eta <- pi_eta_full_cond(Q*1, I, y)
 n = 100
 theta_grid <- (seq(0, 6, length.out = n))
-#theta =  pi_theta_given_y(theta_grid[1], Q, I, y, eta)
 
 post_theta <- (lapply(seq(0.0000, 6, length.out = n), pi_theta_given_y, Q, I, y, eta))
 

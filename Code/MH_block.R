@@ -11,8 +11,6 @@ data[, cum_event := cumsum(event)]
 data[, date := date- 1851]
 
 
-
-
 f_target_1 <- function(lambda_0, lambda_1, t, t_0, t_2, beta, y_0, y_1){
   if(t<t_0){
     return (0)
@@ -30,11 +28,9 @@ f_prop_1 <- function(lambda_0, lambda_1, t_given, t_cur, t_0, t_2, beta, y_0, y_
   if(t> t_2){
    retval <- 0
   }
-  #return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
-  
-  retval <- dgamma(lambda_0, (y_0 +2), scale= (1/(t_cur - t_0 + 1/beta)))*dgamma(lambda_1, (y_1 +2), scale= (1/(t_2 - t_cur + 1/beta)))*dnorm(t, t_given,sigma_t)
-  #print("retval_prop")
-  #print(retval)
+  retval <- (dgamma(lambda_0, (y_0 +2), scale= (1/(t_cur - t_0 + 1/beta)))*
+    dgamma(lambda_1, (y_1 +2), scale= (1/(t_2 - t_cur + 1/beta)))*
+    dnorm(t, t_given,sigma_t))
   return(retval)
 }
 
@@ -44,15 +40,14 @@ f_target_2 <- function(lambda_0, lambda_1, beta, t_0, t_2, t, y_0, y_1){
   }
   print("beta_target")
   print(beta)
-  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- (1/beta)*(lambda_0 + lambda_1+1))*lambda_0^{y_0+ 1}*lambda_1^{y_1+1})*(1/beta^5)
+  return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- (1/beta)*
+               (lambda_0 + lambda_1+1))*lambda_0^{y_0+ 1}*
+           lambda_1^{y_1+1}*(1/beta^5))
 }
 
 f_prop_2 <- function(lambda_0, lambda_1, t, t_0, t_2, beta_cur, beta_given, y_0, y_1, sigma_beta){
     print("beta_prop")
     print(beta_cur)
-    #return(exp(-lambda_0*(t-t_0) - lambda_1*(t_2-t)- beta*(lambda_0 + lambda_1))*lambda_0^y_0*lambda_1^y_1)
-    # print((1/(t - t_0 + 1/beta_cur)))
-    # print(1/(t_2 - t + 1/beta_cur))
     print("scale_prop")
     print(1/(t - t_0 + 1/beta_cur))
     print(1/(t_2 - t + 1/beta_cur))
@@ -250,3 +245,9 @@ q
 
 summary(sim_MH)
 3*41 + 0.92*(112-41)
+
+burnin <- 5000
+
+sim_t <- sim_MH$t[burnin:n]
+
+acf(sim_t)
