@@ -94,20 +94,20 @@ summary(posterior_dist_MC)
 
 posterior_dist_MC_usefull <- posterior_dist_MC[25000:nrow(posterior_dist_MC), ]
 
-post_data_MC <- as.data.table(posterior_dist_MC)
-post_data_MC[, itteration:= 1:nrow(post_data_MC)]
+posterior_dist_MC_usefull <- as.data.table(posterior_dist_MC_usefull)
+posterior_dist_MC_usefull[, itteration:= 1:nrow(posterior_dist_MC_usefull)]
 
 q <- ggplot(data = post_data_MC, aes(x = itteration) )
 q <- q + geom_line(aes(y = V1))
 q
 
-q <- ggplot(post_data_MC, aes(x = V1))
+q <- ggplot(posterior_dist_MC_usefull, aes(x = V1))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q <- q + geom_vline(xintercept = 1.75)
 q
 
 
-q <- ggplot(post_data_MC, aes(x = V11))
+q <- ggplot(posterior_dist_MC_usefull, aes(x = V11))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q
 
@@ -185,6 +185,7 @@ I <- diag(1, 20, 20)
 results <- vector("list", length = length(theta_grid))
 j = 10
 plot(1, type="n", xlab="", ylab="", xlim=c(-5, 5), ylim=c(0, 2))
+
 for (i in seq_along(results)){
   sigma <- solve(Q*theta_grid[i] + I)
   sigma_i <- sigma[j,j]
@@ -194,7 +195,7 @@ for (i in seq_along(results)){
   print(sigma_i)
   density <- dnorm(eta_grid, mu_i, sigma_i)
   points(eta_grid, density)
-  results[[i]] <- as.data.table(density)*post_theta[i] #her er feilen den ganger inn to tall
+  results[[i]] <- as.data.table(density)* post_theta[[i]][1] #her er feilen den ganger inn to tall
 }
 
 (as.data.table(results))
@@ -203,6 +204,13 @@ eta <- as.data.table(results)[, density_total := rowSums(.SD)][]
 
 eta[, grid:= eta_grid]
 plot(eta_grid, eta$density_total)
+
+q <- ggplot(post_data_MC, aes(x = V11))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
+q
+
 
 q <- ggplot(data = eta, aes(x = eta_grid, y = density_total))
 q <- q + geom_point()
@@ -239,3 +247,13 @@ q <- q + geom_point(data = data_post, aes(x =x, y = post_theta *0.25*10^ 9, colo
 q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6)
 q
 
+
+eta_10_inla<- result$marginals.random$t$index.10
+
+
+q <- ggplot(post_data_MC, aes(x = V11))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
+q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y ))
+q
