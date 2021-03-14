@@ -79,7 +79,7 @@ lambda_1 <- 5
 beta = 3
 
 # Set n, t_0, t_2 and tuning parameter sigma
-n = 5000
+n = 10000
 t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963? 
 sigma = 3
