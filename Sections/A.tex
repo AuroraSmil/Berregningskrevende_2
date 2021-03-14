@@ -148,6 +148,7 @@ All of this gives us the following algorithm,
 
 To evaluate the burn-in period of the algorithm, we have plotted the values of $\lambda_0, \lambda_1, t_1$ and $\beta$ for $n$ iterations of our MCMC algorithm. This is seen in figure \ref{fig:burnin_singleMH}. 
 
+\todo[color = yellow]{Husk å skrive hva vi har brukt som initialverdier og verdien til sigma}
 
 \begin{figure}[h]
     \centering
@@ -177,51 +178,54 @@ To evaluate the burn-in period of the algorithm, we have plotted the values of $
     \end{subfigure}
     \caption{The value of $\lambda_0, \lambda_1, t_1$ and $\beta$ plotted for $n = 10000$ iterations of the MCMC algorithm.}
     \label{fig:burnin_singleMH}
+    \todo[color = yellow]{Legg in initialverdier og verdien til sigma her også}
 \end{figure}
 
 We plotted the parameters separately so they are easier to evaluate. We need to choose a burn-in period for the algorithm equal to the longest burn-in period amongst the parameters. 
 In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simulations stabilize very quickly, and there is a very small burn-in period for these parameters. 
 \todo[inline]{burn-in for beta. Den er ikke helt stabil}
 \todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
-For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for a number of different $n$. In figure \ref{fig:sim_t_big_n}, we see the simulations of $t_1$ with $n = 50000$ and $n = 100000$ samples. 
+For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for a number of different $n$. 
 
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_1000.pdf}
-        \caption{$n =1000 $}
-        \label{fig:}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_5000.pdf}
-        \caption{$n = 5000 $}
-        \label{fig:}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t.pdf}
-        \caption{$n = 10000$ }
-        \label{fig:}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
-        \caption{$n =  50000$}
-        \label{fig:}
-    \end{subfigure}
-    \caption{Simulations of $t_1$ with $n = 1000, 5000, 10000$ and $n=50000$ samples. }
-    \label{fig:sim_t_big_n}
-\end{figure}
+% In figure \ref{fig:sim_t_big_n}, we see the simulations of $t_1$ with $n = 50000$ and $n = 100000$ samples. 
 
-We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} 
+% \begin{figure}[h]
+%     \centering
+%     \begin{subfigure}[b]{0.49\textwidth}
+%         \centering
+%         \includegraphics[width = \textwidth]{Images/sim_t_1000.pdf}
+%         \caption{$n =1000 $}
+%         \label{fig:}
+%     \end{subfigure}
+%     \begin{subfigure}[b]{0.49\textwidth}
+%         \centering
+%         \includegraphics[width = \textwidth]{Images/sim_t_5000.pdf}
+%         \caption{$n = 5000 $}
+%         \label{fig:}
+%     \end{subfigure}
+%     \begin{subfigure}[b]{0.49\textwidth}
+%         \centering
+%         \includegraphics[width = \textwidth]{Images/sim_t.pdf}
+%         \caption{$n = 10000$ }
+%         \label{fig:}
+%     \end{subfigure}
+%     \begin{subfigure}[b]{0.49\textwidth}
+%         \centering
+%         \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
+%         \caption{$n =  50000$}
+%         \label{fig:}
+%     \end{subfigure}
+%     \caption{Simulations of $t_1$ with $n = 1000, 5000, 10000$ and $n=50000$ samples. }
+%     \label{fig:sim_t_big_n}
+% \end{figure}
+
+% We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} 
 
 \todo[inline]{separate into two areas and calculate the statistics for the areas to evaluate if we have chosen an okay estimate for the burn-in period.}
 
 
 %mixing
-
+\todo[color = yellow]{Dette er forsåvidt rett men ha også med et plott med to forskjellig kjeder og se hvordan de mikser}
 To evaluate the mixing properties of our algorithm, we first plot the autocorrelation function for our parameter $t_1$ after the initial burn-in period, which we have set to be $b = *???$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that the mixing is not slow. 
 
 \begin{figure}[h]
@@ -231,12 +235,13 @@ To evaluate the mixing properties of our algorithm, we first plot the autocorrel
     \label{fig:acf_t}
 \end{figure}
 
+\todo[color = yellow]{Her skal det være convergense property. Det er jo verdien som det convergeres mot som må være reasonable ift original datasettet}
 To investigate the mixing property further, we can 
 \todo[inline]{Use the plot generated in 1 to simulate whether the simulated values are reasonable.}
 
 \subsection{The tuning parameter and how it influences the burn-in and mixing of the simulated Markov Chain}
 
-We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. $\lambda_0, \lambda_1$ and $\beta$ are drawn from known distributions, so the tuning parameter will not affect these samples. For our parameter $t$ however, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We cant to adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{"Set in plots with different values of sigma t"} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  Here we see that with $\sigma = 0.2$, the steps taken are very small. This leads to a slow exploration of the target density, and we see that $n = 10000$ iterations are far too few for the algorithm to converge. This again leads to a very large burn-in period. For $\sigma = 3$, we see that the there is enough mixing for the samples to quickly converge, and the burn-in period thus become small. If we use a very large tuning parameter, for instance $\sigma = 30$, the should be little correlation between $t_{new}$ and $t_{old}$. This means that large moves are proposed, but not often accepted. 
+We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. $\lambda_0, \lambda_1$ and $\beta$ are drawn from known distributions, so the tuning parameter will not affect these samples that much. For our parameter $t$ however, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We cant to adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{"Set in plots with different values of sigma t"} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  Here we see that with $\sigma = 0.2$, the steps taken are very small. This leads to a slow exploration of the target density, and we see that $n = 10000$ iterations are far too few for the algorithm to converge. This again leads to a very large burn-in period. For $\sigma = 3$, we see that the there is enough mixing for the samples to quickly converge, and the burn-in period thus become small. If we use a very large tuning parameter, for instance $\sigma = 30$, the should be little correlation between $t_{new}$ and $t_{old}$. This means that large moves are proposed, but not often accepted. 
 
 %Skriv noe om at stegene aksepteres mindre ofte, men fortsatt ganske ofte med sigma = 30. Skriv også hvorfor vi ikke kan ha hæyere sigma. Fordi det blir maskinelt 0 når eksponentene i e i uttrykket blir for store?
 
@@ -246,12 +251,12 @@ We have implemented our Markov Chain Monte Carlo algorithm with a tuning paramet
 
 \subsection{Implementing a block Metropolis-Hastings algorithm}
 
-To improve the performance of our Metropolis-Hastings algorithm, we can perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will investigate the performance of two different block proposals in this exercise. 
+To improve the performance of our Metropolis-Hastings algorithm, we can perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will implement a block Metropolis-Hastings algorithm with two blocks.
 
 %A block Metropolis-Hastings algorithm for $f(\theta|x)$ can be defined as 
 %skriv noe om Gibbs sampling?
 
-We have chosen to alternate between blocking together $t_1, \lambda_0$ and  $ \lambda_1$ and keeping $\beta$ unchanged, and blocking $\beta, \lambda_0$ and $\lambda_1$ together, keeping $t_1$ unchanged, updating or not updating the parameters every other time These two block proposals have different target distributions and different proposal distributions. This again leads to the expressions for the proposal distributions to be different.
+We alternate between blocking together $t_1, \lambda_0$ and  $ \lambda_1$ and keeping $\beta$ unchanged, and blocking $\beta, \lambda_0$ and $\lambda_1$ together, keeping $t_1$ unchanged.
 
 
 \subsubsection{Using a block proposal for $(t_1, \lambda_0, \lambda_1)$ keeping $\beta$ unchanged}
@@ -263,14 +268,13 @@ We have chosen to alternate between blocking together $t_1, \lambda_0$ and  $ \l
 \end{align}
 
 % Proposal distribution. Skriv om RW
-We use a random walk proposal function, and the random walk proposal values are generated by firstly generating $\widetilde{t_1}$ from a normal distribution, and then using the value for $\widetilde{t_1}$ when generating ($\widetilde{\lambda_0}$, $\widetilde{\lambda_1}$) from their joint full conditional. This is then used as the proposal function. As we assume $\lambda_0$ and $\lambda_1$ independent, we have that 
+We use a random walk proposal density, and the random walk proposal values are generated by firstly generating $\widetilde{t_1}$ from a normal distribution, and then using the value for $\widetilde{t_1}$ when generating ($\widetilde{\lambda_0}$, $\widetilde{\lambda_1}$) from their joint full conditional. This is then used as the proposal function. As we assume $\lambda_0$ and $\lambda_1$ independent, we have that 
 
 \begin{align}
-    Q(\widetilde{t_1}, \lambda_0, \lambda_1) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(t_1) \nonumber \\
-    = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big(  -\lambda_0(\frac{1}{\beta} + t_1 - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - t_1)  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
+    Q(\widetilde{t_1}, \lambda_0, \lambda_1 |t) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(\widetilde{t_1}| t) \nonumber %\\
+    % = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big(  -\lambda_0(\frac{1}{\beta} + \widetilde{t_1} - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - \widetilde{t_1})  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
 \end{align}
-
-
+\todo[color = yellow]{Vi trenger ikke skrive ut det fulle uttrukket, det over holder. I tillegg er det som er kommentert ut ikke helt riktig husk at lamdaene også har nye og gamele verdier så nesten ingen ting kanselerer}
 
 For the acceptance probability, we have that
 
@@ -308,7 +312,7 @@ Again, we choose to have a random walk as our proposal density. Now, we generate
 We again consider $\lambda_0$ and $\lambda_1$ independent, so the joint conditional is just the full conditionals of each multiplied. We can then find an expression for the proposal function,
 
 \begin{align}
-    Q(\widetilde{\beta}, \lambda_0, \lambda_1) = f(\lambda_0| \lambda_1, x, \widetilde{\beta}, t_1)\cdot f(\lambda_1| \lambda_0, x, \widetilde{\beta}, t_1)\cdot f(\beta) \nonumber \\
+    Q(\widetilde{\beta}, \lambda_0, \lambda_1| \beta) = f(\lambda_0| \lambda_1, x, \widetilde{\beta}, t_1)\cdot f(\lambda_1| \lambda_0, x, \widetilde{\beta}, t_1)\cdot f(\widetilde{\beta}| \beta) \nonumber \\
     = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big( -\lambda_0(\frac{1}{\widetilde{\beta}} + t_1 - t_0) - \lambda_1(\frac{1}{\widetilde{\beta}} + t_2 - t_1)  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_{\beta} } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{\beta}-\beta)^2}{\sigma_{\beta}^2} \Big).
 \end{align}
 
@@ -322,12 +326,12 @@ For the acceptance probability, we then have that
     \alpha = min \Bigg(1,  \frac{
     f(\beta_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|t_1, x)}{f(\beta_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|t_1, x)}
     \cdot 
-    \frac{Q(\beta_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | t_1, x, \beta_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | t_1, x, \beta_{old})} \Bigg) \\
-    = min \Bigg(1, \frac{ exp \Big( -\lambda_0 \beta_{new} +\lambda_1 \beta_{new}  \Big)}{ exp \Big( -\lambda_0 \beta_{old} +\lambda_1 \beta_{old} \Big)} 
-    \cdot \frac{ exp \Big(  -\lambda_0 \beta_{new} + \lambda_1 \beta_{new}  -\frac{1}{2} \frac{(\widetilde{\beta}_{new}-\beta_{new})^2}{\sigma_{\beta}^2} \Big)}{ exp \Big(  -\lambda_0 \beta_{old}  + \lambda_1 \beta_{old}  -\frac{1}{2} \frac{(\widetilde{\beta}_{old}-\beta_{old})^2}{\sigma_{\beta}^2} \Big)}  \Bigg).
+    \frac{Q(\beta_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | t_1, x, \beta_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | t_1, x, \beta_{old})} \Bigg) %\\
+    % = min \Bigg(1, \frac{ exp \Big( -\lambda_0 \beta_{new} +\lambda_1 \beta_{new}  \Big)}{ exp \Big( -\lambda_0 \beta_{old} +\lambda_1 \beta_{old} \Big)} 
+    % \cdot \frac{ exp \Big(  -\lambda_0 \beta_{new} + \lambda_1 \beta_{new}  -\frac{1}{2} \frac{(\widetilde{\beta}_{new}-\beta_{new})^2}{\sigma_{\beta}^2} \Big)}{ exp \Big(  -\lambda_0 \beta_{old}  + \lambda_1 \beta_{old}  -\frac{1}{2} \frac{(\widetilde{\beta}_{old}-\beta_{old})^2}{\sigma_{\beta}^2} \Big)}  \Bigg).
 \end{align}
 
-
+\todo[color = yellow]{Se kommentaren over}
 
 
 %input the code for the algorithm. Remember to clean the code for all print statements. 
