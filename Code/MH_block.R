@@ -4,6 +4,7 @@ library(boot)
 library(data.table)
 library(tidyr)
 library(ggplot2)
+library(gridExtra)
 
 data <- as.data.table(coal)
 data[, event:= 1]
@@ -215,7 +216,7 @@ beta = 3
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma_t = 3
+sigma_t = 0.3
 sigma_beta = 0.3
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma_t = sigma_t, sigma_beta = sigma_beta)
@@ -227,19 +228,22 @@ setnames(sim_MH, c("t", "lambda_0", "lambda_1", "beta", "a"))
 sim_MH[, itteration := seq(1:n)]
 sim_MH
 
-q <- ggplot(data = sim_MH, aes(x = itteration) )
-q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
-q
-q <- ggplot(data = sim_MH, aes(x = itteration) )
-q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
-q
-q <- ggplot(data = sim_MH, aes(x = itteration) )
-q <- q + geom_line(aes(y = beta, colour = "beta"))
-q
-q <- ggplot(data = sim_MH, aes(x = itteration) )
-q <- q + geom_line(aes(y = t, colour = "t"))
-q
+par(mfrow = c(2,2))
 
+q1 <- ggplot(data = sim_MH, aes(x = itteration) )
+q1 <- q1 + geom_line(aes(y = lambda_0, colour = "lambda_0"))
+q1
+q2 <- ggplot(data = sim_MH, aes(x = itteration) )
+q2 <- q2 + geom_line(aes(y = lambda_1, colour = "lambda_1"))
+q2
+q3 <- ggplot(data = sim_MH, aes(x = itteration) )
+q3 <- q3 + geom_line(aes(y = beta, colour = "beta"))
+q3
+q4 <- ggplot(data = sim_MH, aes(x = itteration) )
+q4 <- q4 + geom_line(aes(y = t, colour = "t"))
+q4
+
+grid.arrange(q1,q2,q3,q4, ncol = 2)
 
 #only beta has a burn in period! kind of
 
