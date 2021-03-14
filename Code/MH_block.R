@@ -216,7 +216,7 @@ beta = 3
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma_t = 3
+sigma_t = 0.1
 sigma_beta = 0.3
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma_t = sigma_t, sigma_beta = sigma_beta)
@@ -243,7 +243,7 @@ q4 <- ggplot(data = sim_MH, aes(x = itteration) )
 q4 <- q4 + geom_line(aes(y = t, colour = "t"))
 q4
 
-grid.arrange(q1,q2,q3,q4, ncol = 2)
+#grid.arrange(q1,q2,q3,q4, ncol = 2)
 
 #only beta has a burn in period! kind of
 
