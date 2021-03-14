@@ -216,7 +216,7 @@ beta = 3
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma_t = 0.3
+sigma_t = 3
 sigma_beta = 0.3
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma_t = sigma_t, sigma_beta = sigma_beta)
