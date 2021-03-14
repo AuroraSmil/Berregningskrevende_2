@@ -1,8 +1,13 @@
 \section{Markov Chain Monte Carlo simulations}
 
+\todo[color = yellow, inline]{Til Aurora. Jeg tenker at det er kjekt å se hvem som har lagt inn kommentarer i teksten, så hvis du bruker en annen farge enn oransje, så er det lett å skille på hvem sine kommentarer det er. Fargen kan endres til noe annet enn gul om du vil.}
+\todo[color = yellow]{om du ikke vil ha kommentaren inline}
+
 In this problem, we are looking at a well known data set of time intervals between successive coal-mining disasters in the UK involving ten or more killed. 
 
 \subsection{Exploring the data set}
+To get a greater understanding of the data set, we have made a plot of the data set, seen in figure \ref{}, where we have plotted the year along the x-axis and the cumulative number of disasters along the y-axis. 
+
 
 \subsection{The posterior distribution} \label{posterior}
 We are adopting a hierarchical Bayesian model to analyse the data set. We assume that the coal-mining disasters follow a inhomogeneous Poisson Poisson process with intensity function $\lambda(t)$. We assume $\lambda(t)$ to be piecewise constant with $n$ breakpoints. We let $t_0$ and $t_{n+1}$ denote the start and the end times for the data set and let $t_k; k = 0,...,n$ denote the break points of the intensity function. We then have 
@@ -54,7 +59,7 @@ The likelihood $f(x | \theta)$ is given, and we need to find an expression for t
 \end{align}
 
 So, using this and the given likelihood, we can find the posterior distribution for $f(\theta|x)$
-\todo{sjekk dette uttrykket. utregningen er litt ulik Aurora sin.}
+
 \begin{align} \label{eq:post}
     f(\theta|x) \propto exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k+1} - t_k) \Big)\cdot \prod_{k = 0}^1 \lambda_k^{y_k} \cdot \frac{1}{t_2-t_0} 
     \Big( \frac{1}{\beta^2} \lambda_0 \cdot
@@ -91,7 +96,6 @@ The full conditional for $\lambda_0$ and $\lambda_1$ can also be found by using 
 and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed. 
 
 
-\todo[inline]{Feil i uttrykkene for t1 og beta}
 
 For the last parameter $\beta$, the full conditional is
 
@@ -105,7 +109,15 @@ and we also recognize this as belonging to a gamma distribution.
 \subsection{Implementing a single site MCMC algorithm}
 
 We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions found in section \ref{full_cond}, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
-To find $t_1$, we use the Metropolis-Hastings algorithm. We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q()$, where $Q()$ is our proposal distribution. We have chosen $Q() \sim N(t_{old}, \sigma)$. We then compute the acceptance probability for $t_{new}$
+To find $t_1$, we use the Metropolis-Hastings algorithm. We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q()$, where $Q()$ is our proposal distribution. We have chosen $Q() \sim N(t_{old}, \sigma)$.
+Our algorithm is 
+
+%input code lines here. 
+%\lstinputlisting[language=R, firstline=, lastline=]{Code/A.R}
+
+
+
+We then compute the acceptance probability for $t_{new}$
 
 \begin{align}
     \alpha() = min \Big( 1, \frac{f(t_{new}| \lambda_0, \lambda_1, \beta, x)}{f(t_{old}| \lambda_0, \lambda_1, \beta, x)} \Big) \nonumber \\ 
@@ -180,11 +192,117 @@ We have implemented our Markov Chain Monte Carlo algorithm with a tuning paramet
 \todo[inline]{legg inn figurer, sigma = 0.2, sigma = 3, Sigma = 30}
 
 
-\subsection{Implementing a block Metropolitan-Hastings algorithm}
+\subsection{Implementing a block Metropolis-Hastings algorithm}
+
+To improve the performance of our Metropolis-Hastings algorithm, we can perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will investigate the performance of two different block proposals in this exercise. 
+
+%A block Metropolis-Hastings algorithm for $f(\theta|x)$ can be defined as 
+%skriv noe om Gibbs sampling?
+
+We have chosen to alternate between blocking together $t_1, \lambda_0$ and  $ \lambda_1$ and keeping $\beta$ unchanged, and blocking $\beta, \lambda_0$ and $\lambda_1$ together, keeping $t_1$ unchanged, updating or not updating the parameters every other time These two block proposals have different target distributions and different proposal distributions. This again leads to the expressions for the proposal distributions to be different.
 
 
 \subsubsection{Using a block proposal for $(t_1, \lambda_0, \lambda_1)$ keeping $\beta$ unchanged}
 
+% Target distribution.Skrv litt rundt denne. 
+\begin{align}
+    \pi(t, \lambda_0, \lambda_1) = exp \Big( -(t_1-t_0)\lambda_0 -(t_2-t_1)\lambda_1 - \frac{1}{\beta}(\lambda_0 - \lambda_1) \cdot\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \Big)
+\end{align}
+
+% Proposal distribution. Skriv om RW
+We use a random walk proposal function, and the random walk proposal values are generated by firstly generating $\widetilde{t_1}$ from a normal distribution, and then using the value for $\widetilde{t_1}$ when generating ($\widetilde{\lambda_0}$, $\widetilde{\lambda_1}$) from their joint full conditional. This is then used as the proposal function. As we assume $\lambda_0$ and $\lambda_1$ independent, we have that 
+
+\begin{align}
+    Q(\widetilde{t_1}, \lambda_0, \lambda_1) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(t_1) \nonumber \\
+    = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big(  -\lambda_0(\frac{1}{\beta} + t_1 - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - t_1)  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
+\end{align}
+
+
+
+For the acceptance probability, we have that
+
+%Acceptance probability
+\begin{align}
+    \alpha = min \Bigg(1,  \frac{
+    \pi(t_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|\beta, x)}{\pi(t_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|\beta, x)}
+    \cdot 
+    \frac{Q(t_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | \beta, x, t_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | \beta, x, t_{old})} \Bigg) \\
+    = min \Bigg(1, \frac{ exp \Big( -\lambda_0t_{1_{new}} +\lambda_1t_{1_{new}}  \Big)}{ exp \Big( -\lambda_0t_{1_{old}} +\lambda_1t_{1_{old}} \Big)} 
+    \cdot \frac{ exp \Big(  -\lambda_0 t_{1_{new}} + \lambda_1 t_{1_{new}}   -\frac{1}{2} \frac{(\widetilde{t}_{1_{new}}-t_{1_{new}})^2}{\sigma_t^2} \Big)}{ exp \Big(  -\lambda_0 t_{1_{old}}  + \lambda_1 t_{1_{old}}  -\frac{1}{2} \frac{(\widetilde{t}_{1_{old}}-t_{1_{old}})^2}{\sigma_t^2} \Big)}   \Bigg).
+\end{align}
+
+\todo[inline]{Kansellere enda flere termer i uttrykket?}
+
+
+
 \subsubsection{Using a block proposal for $\beta, \lambda_0, \lambda_1$ keeping $t_1$ unchanged}
 
+%Target distribution
+%Proposal distribution
+%Acceptance probability
+
+
+
+
+
+
+%input the code for the algorithm. Remember to clean the code for all print statements. 
+
+\todo[inline]{Sette inn og kommentere figurer her. }
+
+
 \subsection{The block Metropolitan-Hastings algorithm for different values of the tuning parameter}
+
+\begin{comment}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \caption{}
+    \label{fig:sigma_t}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \caption{}
+    \label{fig:sigma_beta}
+\end{figure}
+
+\end{comment}
+
+
+In the block Metropolis-Hastings algorithm, we have two different tuning parameters. One for each of the different block proposals. 
+\todo[inline]{Se på koden, klarer ikke å kjøre med stor $\sigma_t$ (f.eks $\sigma_t$ = ), og heller ikke med veldig liten $\sigma_{beta}$ (f.eks $\sigma_{beta}$ = 0.003).}
+
+
+ In figure \ref{}, we have plotted the parameter $t$ and $\beta$ for three different values of $\sigma_t$. We figure \ref{}, we have plotted the simulation of parameters $t$ and $\beta$ for three different values of $\sigma_{\beta}$. The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. However, we see in figures \ref{} and \ref{} that changing the tuning parameter for one of the block does not greatly change the mixing or acceptance rate for the other block. We do however see how the.... 
+ \todo[inline]{Sett inn plott og kommenter de.}
