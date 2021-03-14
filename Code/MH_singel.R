@@ -11,7 +11,8 @@ MH_single_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
   results[1, 1:5] <- c(t, lambda_0, lambda_1, beta, 1)
   for(i in 2:n){
     print(i)
-    # Collect old values for t and beta and compute corresponding y_0 and y_1 values
+    # Collect old values for t and beta and compute corresponding 
+    # y_0 and y_1 values
     t_old <- results[i-1, 1]
     
     y_0_o = sum(data[date <t_old]$event)
@@ -23,21 +24,27 @@ MH_single_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma){
     lambda_0 <- rgamma(1, y_0 + 2, scale = 1/(t_old - t_0 + 1/beta))
     lambda_1 <- rgamma(1, y_1 + 2, scale = 1/(t_2 - t_old + 1/beta))
 
-    beta_tilde <- rgamma(1, 6, scale = 1/(lambda_0 + lambda_1 + 1)) #is this okay to d0?
+    beta_tilde <- rgamma(1, 6, scale = 1/(lambda_0 + lambda_1 + 1)) 
     beta <- 1/beta_tilde
     
     results[i, 2:4] <- c( lambda_0, lambda_1, beta)
     
-    # Preform MH step with the random walk of order one as the proposal density
+    # Preform MH step with the random walk of order one 
+    # as the proposal density
     t_new <- rnorm(1, t_old, sigma)
     
     ### Compute corresponding values for y_0 and y_1
     y_0_n = sum(data[date <t_new]$event)
     y_1_n = sum(data[date>= t_new]$event)
     
-    ### Compute the acceptance probability in log scale and compare with u unif(0,1)
-    a_log <- (((y_0_n +1)*log(lambda_0) + (y_1_n +1)*log(lambda_1) - t_new *(lambda_0 - lambda_1 )) - 
-                ((y_0_o +1)*log(lambda_0) + (y_1_o +1)*log(lambda_1) - t_old *(lambda_0 - lambda_1 )))
+    ### Compute the acceptance probability in log scale and
+    # compare with u unif(0,1)
+    a_log <- (((y_0_n +1)*log(lambda_0) 
+               + (y_1_n +1)*log(lambda_1) 
+               - t_new *(lambda_0 - lambda_1 )) - 
+                ((y_0_o +1)*log(lambda_0) 
+                 + (y_1_o +1)*log(lambda_1) 
+                 - t_old *(lambda_0 - lambda_1 )))
     u <- runif(1)
     results[i, 5] <-  exp(a_log)
     if (u< exp(a_log)){
