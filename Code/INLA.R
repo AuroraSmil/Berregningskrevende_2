@@ -6,14 +6,23 @@ library(mvtnorm)
 
 # Importing data
 data <- as.data.table(read.delim("code/Gaussiandata.txt", header = FALSE))
-data[, t := seq(1:nrow(data))]
+data[, x := seq(1:nrow(data))]
 setnames(data, "V1", "value")
 head(data)
 
 # Plot the data
-q <- ggplot(data, aes(t, value))
+q <- ggplot(data, aes(x, value))
 q <- q + geom_point()
+q <- q + ggtitle("Gaussian data")
 q
+
+ggsave(
+  "gaussian_data.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
 #Define T = number of events
 T = 20
@@ -98,16 +107,45 @@ q <- ggplot(data = as.data.table(posterior_dist_MC), aes(x = 1:n) )
 q <- q + geom_line(aes(y = V1))
 q
 
-q <- ggplot(posterior_dist_MC_usefull, aes(x = V1))
-q <- q + geom_histogram(aes(y = ..density..), bins = 100)
-q <- q + geom_vline(xintercept = 1.75)
+ggsave(
+  "post_theta_mcmc.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+
+
+posterior_dist_MC_usefull.long = melt(posterior_dist_MC_usefull, id.vars = c("V1", "itteration"),
+             measure.vars = c(2:21))
+
+
+
+post_eta_mcmc_aggregated <- posterior_dist_MC_usefull.long[, .(
+  mean = mean(value),
+  q_lower = quantile(value, probs = 0.025), 
+  q_upper = quantile(value, probs = 0.975)),
+  keyby = .(variable)]
+
+post_eta_mcmc_aggregated[,variable:= seq(1,20,1)]
+
+q <- ggplot(post_eta_mcmc_aggregated, aes(x = as.factor(variable), y = mean))
+q <- q + geom_point()+
+  geom_errorbar(aes(ymin=q_lower, ymax=q_upper), width=.2,
+                position=position_dodge(0.05))
+q <- q + xlab("eta")
+q <- q + xlab("value")
+q <- q + ggtitle("Mean and 95 % credible interval for the smoothing parameter")
 q
 
-
-q <- ggplot(posterior_dist_MC_usefull, aes(x = V11))
-q <- q + geom_histogram(aes(y = ..density..), bins = 100)
-q
-
+ggsave(
+  "post_eta_mcmc.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
 #INLA scheme #################
 
