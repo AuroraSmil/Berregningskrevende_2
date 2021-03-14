@@ -6,7 +6,14 @@
 In this problem, we are looking at a well known data set of time intervals between successive coal-mining disasters in the UK involving ten or more killed. 
 
 \subsection{Exploring the data set}
-To get a greater understanding of the data set, we have made a plot of the data set, seen in figure \ref{}, where we have plotted the year along the x-axis and the cumulative number of disasters along the y-axis. 
+To get a greater understanding of the data set, we have made a plot of the data set, seen in figure \ref{fig:cumul_plot}, where we have plotted the year along the x-axis and the cumulative number of disasters along the y-axis. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = \textwidth]{Images/cumulative_plot_data.pdf}
+    \caption{Cumulative plot of coal-mining disasters in the UK occurring between 1851 and 1962.}
+    \label{fig:cumul_plot}
+\end{figure}
 
 
 \subsection{The posterior distribution} \label{posterior}
@@ -71,7 +78,7 @@ So, using this and the given likelihood, we can find the posterior distribution 
 
 \subsection{Finding the full conditionals} \label{full_cond}
 
-To find the full conditional for each of the elements in $\theta$, we use the expression for the posterior distribution found above in section \ref{posterior}. When we are looking at the full conditional for one of the elements in $\theta$, the other parameters stays constant. This means what we can overlook them for now, and we get that the full conditional for $t_1$ is
+To find the full conditional for each of the elements in $\theta$, we use the expression for the posterior distribution found above in section \ref{posterior}. When we are looking at the full conditional for one of the elements in $\theta$, the other parameters stays constant. This means what we can overlook them in our proportional model, and we get that the full conditional for $t_1$ is
 
 \begin{align}
     f(t_1 | \lambda_0, \lambda_1, \beta, x) \propto 
@@ -108,9 +115,9 @@ and we also recognize this as belonging to a gamma distribution.
 
 \subsection{Implementing a single site MCMC algorithm}
 
-We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions found in section \ref{full_cond}, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
-To find $t_1$, we use the Metropolis-Hastings algorithm. We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q()$, where $Q()$ is our proposal distribution. We have chosen $Q() \sim N(t_{old}, \sigma)$.
-Our algorithm is 
+We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from seen in equation \ref{eq:post}.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions found in section \ref{full_cond}, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
+To find $t_1$, we use the Metropolis-Hastings algorithm with a random walk. We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q(t_1|x)$ using a random walk step, where $Q(t_1|x)$ is our proposal distribution. We have chosen our random walk step to be normally distributed with mean $t_{old}$ and standard deviation $\sigma$.
+Our algorithm is then
 
 %input code lines here. 
 %\lstinputlisting[language=R, firstline=, lastline=]{Code/A.R}
@@ -120,17 +127,16 @@ Our algorithm is
 We then compute the acceptance probability for $t_{new}$
 
 \begin{align}
-    \alpha() = min \Big( 1, \frac{f(t_{new}| \lambda_0, \lambda_1, \beta, x)}{f(t_{old}| \lambda_0, \lambda_1, \beta, x)} \Big) \nonumber \\ 
+    \alpha(t_{new}|x) = min \Big( 1, \frac{f(t_{new}| \lambda_0, \lambda_1, \beta, x)}{f(t_{old}| \lambda_0, \lambda_1, \beta, x)} \Big) \nonumber \\ 
     = min \Big( \frac{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} exp(-(\lambda_0 - \lambda_1)t_{new})}{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} exp(-(\lambda_0 - \lambda_1)t_{old})} \Big) \nonumber \\
     = min \Big( 1, \frac{exp(-(\lambda_0 - \lambda_1)t_{new})}{exp(-(\lambda_0 - \lambda_1)t_{old})} \Big)
 \end{align}
 
 
 
-
-and accept or reject the proposed $\beta$. 
+and accept or reject the proposed $t$. 
 \todo{Bør jeg gå mer i detalj om acceptance/rejection her?}
-\todo[inline]{Skriv mer om Q og RW}
+
 
 
 \subsection{Burn-in and mixing period of the algorithm}
@@ -138,7 +144,7 @@ and accept or reject the proposed $\beta$.
 To evaluate the burn-in period of the algorithm, we have plotted the values of $\lambda_0, \lambda_1, t_1$ and $\beta$ for $n$ iterations of our MCMC algorithm. This is seen in figure \ref{fig:burnin_singleMH}. 
 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -155,7 +161,7 @@ To evaluate the burn-in period of the algorithm, we have plotted the values of $
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t.pdf}
-        \caption{$t$}
+        \caption{$t_1$}
         \label{fig:burnin_t}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
@@ -164,20 +170,61 @@ To evaluate the burn-in period of the algorithm, we have plotted the values of $
         \caption{$\beta$}
         \label{fig:burnin_beta}
     \end{subfigure}
-    \caption{The value of $\lambda_0, \lambda_1, t$ and $\beta$ plotted for $n = 10000$ iterations of the MCMC algorithm.}
+    \caption{The value of $\lambda_0, \lambda_1, t_1$ and $\beta$ plotted for $n = 10000$ iterations of the MCMC algorithm.}
     \label{fig:burnin_singleMH}
 \end{figure}
 
 We plotted the parameters separately so they are easier to evaluate. We need to choose a burn-in period for the algorithm equal to the longest burn-in period amongst the parameters. 
-In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simulations stabilize very quickly, and there is a very small burn-in period for these parameters.
+In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simulations stabilize very quickly, and there is a very small burn-in period for these parameters. 
 \todo[inline]{burn-in for beta. Den er ikke helt stabil}
-\todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar jvordan disse ser ut..}
-For the parameter $beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. 
-We do this by running the algorithm $n = 50000$ and $n = 100000$ times. 
+\todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
+For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for a number of different $n$. In figure \ref{fig:sim_t_big_n}, we see the simulations of $t_1$ with $n = 50000$ and $n = 100000$ samples. 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
+        \caption{$n = 50000$}
+        \label{fig:sim_t_50000}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/sim_t_100000.pdf}
+        \caption{$n = 100000$}
+        \label{fig:sim_t_100000}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/.pdf}
+        \caption{$n =$ }
+        \label{fig:}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
+        \caption{$n =$ }
+        \label{fig:}
+    \end{subfigure}
+    \caption{Simulations of $t_1$ with $n = 50000$ and $n=100000$ samples. }
+    \label{fig:sim_t_big_n}
+\end{figure}
+
+We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} are stable, with no flu
+
+\todo[inline]{separate into two areas and calculate the statistics for the areas to evaluate if we have chosen an okay estimate for the burn-in period.}
+
 
 %mixing
 
-To evaluate the mixing properties of our algorithm, we first plot the autocorrelation function for our parameter $t$ after the initial burn-in period, which we have set to be $b = *???$ iterations. The autocorrelation plot is shown in figure \ref{}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that the mixing is not slow. 
+To evaluate the mixing properties of our algorithm, we first plot the autocorrelation function for our parameter $t_1$ after the initial burn-in period, which we have set to be $b = *???$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that the mixing is not slow. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{Images/acf_t_10000.pdf}
+    \caption{Autocorrelation function of $t_1$ for different $lag$. }
+    \label{fig:acf_t}
+\end{figure}
 
 To investigate the mixing property further, we can 
 \todo[inline]{Use the plot generated in 1 to simulate whether the simulated values are reasonable.}
