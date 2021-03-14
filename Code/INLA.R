@@ -3,6 +3,8 @@ library(data.table)
 library(Matrix)
 library(MASS)
 library(mvtnorm)
+library(latex2exp)
+library(tikzDevice)
 
 # Importing data
 data <- as.data.table(read.delim("code/Gaussiandata.txt", header = FALSE))
@@ -106,6 +108,15 @@ summary(posterior_dist_MC_usefull)
 q <- ggplot(data = as.data.table(posterior_dist_MC), aes(x = 1:n) )
 q <- q + geom_line(aes(y = V1))
 q
+
+q <- ggplot(posterior_dist_MC_usefull, aes(x = V1))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- q + geom_vline(xintercept = 1.79)
+q <- q + xlab(unname(TeX(c("$\\theta$"))))
+q <- q + ylab("Density")
+q <- q + ggtitle(unname(TeX("Posterior density of $\\theta$")))
+q
+
 
 ggsave(
   "post_theta_mcmc.pdf",
