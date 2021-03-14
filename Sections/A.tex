@@ -3,10 +3,10 @@
 \todo[color = yellow, inline]{Til Aurora. Jeg tenker at det er kjekt å se hvem som har lagt inn kommentarer i teksten, så hvis du bruker en annen farge enn oransje, så er det lett å skille på hvem sine kommentarer det er. Fargen kan endres til noe annet enn gul om du vil.}
 \todo[color = yellow]{om du ikke vil ha kommentaren inline}
 
-In this problem, we are looking at a well known data set of time intervals between successive coal-mining disasters in the UK involving ten or more killed. 
+In this problem, we are looking at a well known data set of time intervals between successive coal-mining disasters in the UK involving ten or more killed. We will adopt a Bayesian model to analyse the data and implement both a single site and a block Metropolitan-Hastings algorithm to find the underlying distribution of the parameters involved in the model. To to so we will find the posterior distribution of the underlying model parameters and the full conditional for each of the model parameters. 
 
-\subsection{Exploring the data set}
-To get a greater understanding of the data set, we have made a plot of the data set, seen in figure \ref{fig:cumul_plot}, where we have plotted the year along the x-axis and the cumulative number of disasters along the y-axis. 
+\subsection{Data exploration}
+To get a greater understanding of the data set, the data set is plotted. This can be seen in figure \ref{fig:cumul_plot}, where we have plotted the year along the x-axis and the cumulative number of disasters along the y-axis. 
 
 \begin{figure}[h]
     \centering
@@ -15,60 +15,61 @@ To get a greater understanding of the data set, we have made a plot of the data 
     \label{fig:cumul_plot}
 \end{figure}
 
+We can instantly see that the incline of the graf is different at the begining and the end of the period. It loks like this shift happens some time between 1885 and 1900. 
 
-\subsection{The posterior distribution} \label{posterior}
-We are adopting a hierarchical Bayesian model to analyse the data set. We assume that the coal-mining disasters follow a inhomogeneous Poisson Poisson process with intensity function $\lambda(t)$. We assume $\lambda(t)$ to be piecewise constant with $n$ breakpoints. We let $t_0$ and $t_{n+1}$ denote the start and the end times for the data set and let $t_k; k = 0,...,n$ denote the break points of the intensity function. We then have 
+
+\subsection{Posterior distribution of underlying model parameters} \label{posterior}
+\todo[color = yellow]{Litt pirk her men når tenksten er såpass lik oppgaveteksten synes jeg der er ryddig å på en måte referere til oppgaven så det kommer tydelig fram at vi ikke har funnet det på selv. Jeg skrev det også om bittelitt}
+
+As proposed in the exercise set we are adopting a hierarchical Bayesian model to analyse the data set. We assume that the coal-mining disasters follow a inhomogeneous Poisson process with intensity function $\lambda(t)$. We assume $\lambda(t)$ to be piecewise constant with $n$ breakpoints. The start and endpoints are denoted by $t_0$ and $t_{n+1}$ for the data set and let $t_k; k = 0,...,n$ denote the break points of the intensity function. In our case we only have one break point. This means,  
 \todo{Trenger jeg ha med all denne forklaringen, eller er det nok å si at n = 1 litt tidligere?} 
-
+\todo[color = yellow]{Forklaringen er fin men vi kan gjøre herifra og ut med våre parametre :) }
 
 \begin{align}
-    \lambda(t) = 
-    \begin{cases}
-        \textbf{for } t \in [t_{k-1}), k = 1,...,n, \\
-        \textbf{for } t \in [t_n, t_{n+1}].
-    \end{cases}
+    \lambda_0 = \textbf{for } t \in [t_0,t_{1}]) \text{ and }\\
+    \lambda_1 = \textbf{for } t \in [t_1, t_2].
 \end{align}
 
-One can derive the likelihood function for the observed data as
+The likelihood function for the observed data is given by,
 
 \begin{align}
-    f(x|t_1,...,tn,\lambda_1,...,\lambda) 
-    = exp \Big( - \sum_{k = 0}^n \lambda_k (t_{k-1} - t_k) \prod_{k = 0}^n \lambda_k^{y_k} \Big), 
+    f(x|t_1,\lambda_1,\lambda_2) 
+    = exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k-1} - t_k) \prod_{k = 0}^1 \lambda_k^{y_k} \Big), 
 \end{align}
 where $x$ is the observed data and $y_k$ is the number of observed disasters in the period $t_k$ to $t_{k+1}$. 
 
-We assume $t_1,...,t_n$ to be apriori uniformly distributed on the allowed values, and $\lambda_0,...,\lambda_n$ to be apriori independent of $t_1,...,t_n$ and apriori independent from each other. Apriori we also assume all $\lambda_0,...,\lambda_n$ to be distributes from the same gamma distribution with $\alpha = 2$ and scale parameter $\beta$. Thus, we have 
+We assume $t_1$ to be apriori uniformly distributed on $[t_0, t_2]$, and $\lambda_0, \lambda_1$ to be apriori independent of $t_1$ and of each other. We also assume $\lambda_0,\lambda_1$ to have the gamma prior distribution with $\alpha = 2$ and scale parameter $\beta$. Thus, we have 
 
 \begin{align}
-    \pi(\lambda_i | \beta) = \frac{1}{\beta^2}\lambda_i e^{-\frac{\lambda_i}{\beta}} \textbf{ for } \lambda_i \geq 0,
+    \pi(\lambda_i | \beta) = \frac{1}{\beta^2}\lambda_i e^{-\frac{\lambda_i}{\beta}} \textbf{ for } \lambda_i \geq 0.
 \end{align}
 
-and for $\beta$ we use the improper prior 
+The hyper parameter $\beta$ follows the following improper distribution,
 
 \begin{align}
     \pi (\beta) \propto \frac{exp\{ -\frac{1}{\beta} \} }{\beta} \textbf{ for } \beta > 0.
 \end{align}
 
-In the following we assume $n = 1$, so our model parameters are $\theta = (t_1, \lambda_0, \lambda_1, \beta)$. 
-
-To find an expression for the posterior model for $\theta$ given $x$, $f(\theta|x)$, we use Bayes' theorem, and find that 
+In total this gives us the following model parameters, $\boldsymbol{\theta} = (t_1, \lambda_0, \lambda_1, \beta)$. 
+To find an expression for the posterior distribution of $\boldsymbol{\theta}$ given $x$, $f(\boldsymbol{\theta}|x)$, we use Bayes' theorem, and find that 
 \todo{forklar mer hvordan vi kommer fram til dette?}
+\todo[color = yellow]{la til mellomsteget. Det er ikke egentlig noe mer og forklare her det er sånn Bayes formula er definert :) }
 \begin{align}
-    f(\theta|x) \propto f(x|\theta) \pi(\theta).
+    f(\theta|x) = \frac{f(x|\theta) \pi(\theta)}{f(x)} \propto f(x|\theta) \pi(\theta) .
 \end{align}
-The likelihood $f(x | \theta)$ is given, and we need to find an expression for the apriori $\pi(\theta)$. Because of the independence between $t_1, \lambda_0$ and $\lambda_1$, as well as $\pi(t_1|\beta) = \pi(t_1)$ we have
+The likelihood $f(x | \boldsymbol{\theta})$ is given above, $\pi(\boldsymbol{\theta})$ can be computed knowing $t_1, \lambda_0$ and $\lambda_1$ are all independent. In total this means,
 
 \begin{align}
-    \pi(\theta) 
+    \pi(\boldsymbol{\theta}) 
     = \pi(t_1, \lambda_0, \lambda_1, \beta) \nonumber \\
-    = \pi(t_1, \lambda_0, \lambda_1 | \beta) \cdot \pi(\theta) \nonumber \\
+    = \pi(t_1, \lambda_0, \lambda_1 | \beta) \cdot \pi(\beta) \nonumber \\
     = \pi(t_1) \cdot \pi(\lambda_0|\beta) \cdot \pi(\lambda_1|\beta) \cdot \pi(\beta).
 \end{align}
 
-So, using this and the given likelihood, we can find the posterior distribution for $f(\theta|x)$
+Using this and the given likelihood, we find the posterior distribution for $f(\boldsymbol{\theta}|x)$
 
 \begin{align} \label{eq:post}
-    f(\theta|x) \propto exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k+1} - t_k) \Big)\cdot \prod_{k = 0}^1 \lambda_k^{y_k} \cdot \frac{1}{t_2-t_0} 
+    f(\boldsymbol{\theta}|x) \propto exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k+1} - t_k) \Big)\cdot \prod_{k = 0}^1 \lambda_k^{y_k} \cdot \frac{1}{t_2-t_0} 
     \Big( \frac{1}{\beta^2} \lambda_0 \cdot
     exp \Big({-\frac{\lambda_0}{\beta}} \Big)  \Big) \nonumber \\ 
     \cdot \Big( \frac{1}{\beta^2} \lambda_1 \cdot exp \Big({-\frac{\lambda_1}{\beta}} \Big) \Big) \cdot exp \Big( -\frac{1}{\beta} \Big)/\beta \nonumber \\
@@ -76,9 +77,12 @@ So, using this and the given likelihood, we can find the posterior distribution 
 \end{align}
 
 
-\subsection{Finding the full conditionals} \label{full_cond}
 
-To find the full conditional for each of the elements in $\theta$, we use the expression for the posterior distribution found above in section \ref{posterior}. When we are looking at the full conditional for one of the elements in $\theta$, the other parameters stays constant. This means what we can overlook them in our proportional model, and we get that the full conditional for $t_1$ is
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Full conditional distribution for the model parameters} \label{full_cond}
+
+To find the full conditional for each of the elements in $\boldsymbol{\theta}$, we use the expression for the posterior distribution given in \eqref{eq:post}. When we are looking at the full conditional for one of the elements in $\theta$ gven all the others, the other parameters can be viewed as constants. This means what we can overlook them in our proportional model, and we get that the full conditional for $t_1$ is
 
 \begin{align}
     f(t_1 | \lambda_0, \lambda_1, \beta, x) \propto 
@@ -86,43 +90,40 @@ To find the full conditional for each of the elements in $\theta$, we use the ex
     \propto  \lambda_0^{y_0 + 1} \lambda_1^{y_1 + 1} \cdot exp \Big( -(\lambda_0 - \lambda_1)t_1 \Big).
 \end{align}
 
-We do not recognize the expression for the full conditional as belonging to a named distribution. 
+We do not recognize the expression for the full conditional of $t_1$ as belonging to a named distribution. 
 
-The full conditional for $\lambda_0$ and $\lambda_1$ can also be found by using the posterior distribution from equation \ref{eq:post}. Thus, 
+The full conditional for $\lambda_0$ and $\lambda_1$ can also be found by using the posterior distribution given in \eqref{eq:post}. Thus, 
 
 \begin{align}
     f(\lambda_0 | \lambda_1, t_1, \beta, x) \propto
     \lambda_0^{y_0 + 1}\cdot exp \Big( -\frac{1}{\beta} \lambda_0 - (t_1 - t_0)\lambda_0 \Big) 
     \nonumber \\
-    \propto \frac{1}{\beta^{\alpha} \Gamma(\alpha)}\cdot \lambda_0^{y_0 + 1} \cdot exp \Big( - \lambda_0 (\frac{1}{\beta} + t_1 - t_0) \Big),
+    \propto  \lambda_0^{y_0 + 1} \cdot exp \Big( - \lambda_0 (\frac{1}{\beta} + t_1 - t_0) \Big),
      \\
     f(\lambda_1 | \lambda_0, t_1, \beta, x) \propto
     \lambda_1^{y_1 + 1}\cdot exp \Big( -\frac{1}{\beta} \lambda_1 - (t_2 - t_1)\lambda_1 \Big) \nonumber \\
-    \propto \frac{1}{\beta^{\alpha} \Gamma(\alpha)}\cdot \lambda_1^{y_1 + 1} \cdot exp \Big( - \lambda_1 (\frac{1}{\beta} + t_2 - t_1) \Big),
+    \propto  \lambda_1^{y_1 + 1} \cdot exp \Big( - \lambda_1 (\frac{1}{\beta} + t_2 - t_1) \Big),
 \end{align}
-and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed. 
+and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed with rate, $\alpha$, and scale, $\beta$, parameters respectivly $\alpha_0 = y_0 + 2$, $\beta_0 = \frac{1}{\frac{1}{\beta} + t_1 - t_0}$, $\alpha_1 = y_1 + 2$, $\beta_1 = \frac{1}{\frac{1}{\beta} + t_2 - t_1}$. 
 
 
 
-For the last parameter $\beta$, the full conditional is
+For the last parameter $\beta$, the full conditional is given by,
 
 \begin{align}
     f(\beta | \lambda_0, \lambda_1, t_1, x) \propto 
     \frac{1}{\beta^5} \cdot exp \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) \Big),
 \end{align}
 
-and we also recognize this as belonging to a gamma distribution. 
+and we also recognize this as belonging to a gamma distribution with rate parameter $\alpha_{\beta} = 6$ and scale parameter $\beta_{\beta} = \frac{1}{\lambda_0 + \lambda_1 + 1} $. 
 
-\subsection{Implementing a single site MCMC algorithm}
+\subsection{Single site MCMC algorithm}
 
-We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from seen in equation \ref{eq:post}.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions found in section \ref{full_cond}, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
-To find $t_1$, we use the Metropolis-Hastings algorithm with a random walk. We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q(t_1|x)$ using a random walk step, where $Q(t_1|x)$ is our proposal distribution. We have chosen our random walk step to be normally distributed with mean $t_{old}$ and standard deviation $\sigma$.
-Our algorithm is then
+We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from seen in equation \ref{eq:post}.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
+To find $t_1$, we use the Metropolis-Hastings step with a random walk of order one. This means we propose a new value for $t_1$ which we from now on will call $t$ from the normal distribution with the previous $t$ value as mean and a tuning parameter $\sigma$ as variance. 
 
-%input code lines here. 
-%\lstinputlisting[language=R, firstline=, lastline=]{Code/A.R}
-
-
+\todo[color = yellow]{Her var det noe som ikke ble helt riktig. Det som står nå er rett det som er kommentert ut er ikke helt rett}
+% We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q(t_1|x)$ using a random walk step, where $Q(t_1|x)$ is our proposal distribution. We have chosen our random walk step to be normally distributed with mean $t_{old}$ and standard deviation $\sigma$.
 
 We then compute the acceptance probability for $t_{new}$
 
@@ -132,9 +133,13 @@ We then compute the acceptance probability for $t_{new}$
     = min \Big( 1, \frac{exp(-(\lambda_0 - \lambda_1)t_{new})}{exp(-(\lambda_0 - \lambda_1)t_{old})} \Big)
 \end{align}
 
+and accept or reject the proposed $t$. We note that since the proposal density is a random walk the proposal ration which usually is a part of the acceptance probability cancels out. 
 
+All of this gives us the following algorithm, 
 
-and accept or reject the proposed $t$. 
+%input code lines here. 
+\lstinputlisting[language=R, firstline=3, lastline=57]{Code/MH_singel.R}
+
 \todo{Bør jeg gå mer i detalj om acceptance/rejection her?}
 
 
@@ -184,33 +189,33 @@ For the parameter $\beta$, we see that the samples fluctuate, but the mean and v
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
-        \caption{$n = 50000$}
-        \label{fig:sim_t_50000}
+        \includegraphics[width = \textwidth]{Images/sim_t_1000.pdf}
+        \caption{$n =1000 $}
+        \label{fig:}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_100000.pdf}
-        \caption{$n = 100000$}
-        \label{fig:sim_t_100000}
+        \includegraphics[width = \textwidth]{Images/sim_t_5000.pdf}
+        \caption{$n = 5000 $}
+        \label{fig:}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/.pdf}
-        \caption{$n =$ }
+        \includegraphics[width = \textwidth]{Images/sim_t.pdf}
+        \caption{$n = 10000$ }
         \label{fig:}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t_50000.pdf}
-        \caption{$n =$ }
+        \caption{$n =  50000$}
         \label{fig:}
     \end{subfigure}
-    \caption{Simulations of $t_1$ with $n = 50000$ and $n=100000$ samples. }
+    \caption{Simulations of $t_1$ with $n = 1000, 5000, 10000$ and $n=50000$ samples. }
     \label{fig:sim_t_big_n}
 \end{figure}
 
-We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} are stable, with no flu
+We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} 
 
 \todo[inline]{separate into two areas and calculate the statistics for the areas to evaluate if we have chosen an okay estimate for the burn-in period.}
 
@@ -251,9 +256,10 @@ We have chosen to alternate between blocking together $t_1, \lambda_0$ and  $ \l
 
 \subsubsection{Using a block proposal for $(t_1, \lambda_0, \lambda_1)$ keeping $\beta$ unchanged}
 
-% Target distribution.Skrv litt rundt denne. 
+\todo[inline]{Introduser og skriv litt om target distribution her}
+% Target distribution.Introduser og skriv litt rundt denne. Er den helt rett? 
 \begin{align}
-    \pi(t, \lambda_0, \lambda_1) = exp \Big( -(t_1-t_0)\lambda_0 -(t_2-t_1)\lambda_1 - \frac{1}{\beta}(\lambda_0 - \lambda_1) \cdot\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \Big)
+    f(t_1, \lambda_0, \lambda_1|\beta, x) = exp \Big( -(t_1-t_0)\lambda_0 -(t_2-t_1)\lambda_1 - \frac{1}{\beta}(\lambda_0 - \lambda_1)\Big) \cdot\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} 
 \end{align}
 
 % Proposal distribution. Skriv om RW
@@ -271,7 +277,7 @@ For the acceptance probability, we have that
 %Acceptance probability
 \begin{align}
     \alpha = min \Bigg(1,  \frac{
-    \pi(t_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|\beta, x)}{\pi(t_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|\beta, x)}
+    f(t_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|\beta, x)}{f(t_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|\beta, x)}
     \cdot 
     \frac{Q(t_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | \beta, x, t_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | \beta, x, t_{old})} \Bigg) \\
     = min \Bigg(1, \frac{ exp \Big( -\lambda_0t_{1_{new}} +\lambda_1t_{1_{new}}  \Big)}{ exp \Big( -\lambda_0t_{1_{old}} +\lambda_1t_{1_{old}} \Big)} 
@@ -284,17 +290,48 @@ For the acceptance probability, we have that
 
 \subsubsection{Using a block proposal for $\beta, \lambda_0, \lambda_1$ keeping $t_1$ unchanged}
 
+To generate a block proposal for $\beta, \lambda_0, \lambda_1$ keeping $t_1$ unchanged, we have a target distribution which is 
+
+
 %Target distribution
+%Er dette rett? mangler det en $1/beta$ i flere av eksponentene?
+\begin{align}
+    f(\beta, \lambda_0, \lambda_1| t_1, x) = 
+    \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot \frac{1}{\beta^5} \cdot exp\Bigg(  -\lambda_0(t_1 - t_2) 
+    - \lambda_1 (t_2 - t_1 ) 
+    - \frac{1}{\beta} \cdot (\lambda_0 + \lambda_1  + 1) \Bigg). 
+\end{align}
+
 %Proposal distribution
+
+Again, we choose to have a random walk as our proposal density. Now, we generate the potential values by first generating $\widetilde{\beta}$ from a normal distribution, this being the random walk, and then and then generating ($\widetilde{\lambda}_0, \widetilde{\lambda}_1$) from their resulting joint conditional using $\widetilde{\beta}$, $f(\lambda_0, \lambda_1|x,t_1,\widetilde{\beta})$. 
+We again consider $\lambda_0$ and $\lambda_1$ independent, so the joint conditional is just the full conditionals of each multiplied. We can then find an expression for the proposal function,
+
+\begin{align}
+    Q(\widetilde{\beta}, \lambda_0, \lambda_1) = f(\lambda_0| \lambda_1, x, \widetilde{\beta}, t_1)\cdot f(\lambda_1| \lambda_0, x, \widetilde{\beta}, t_1)\cdot f(\beta) \nonumber \\
+    = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big( -\lambda_0(\frac{1}{\widetilde{\beta}} + t_1 - t_0) - \lambda_1(\frac{1}{\widetilde{\beta}} + t_2 - t_1)  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_{\beta} } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{\beta}-\beta)^2}{\sigma_{\beta}^2} \Big).
+\end{align}
+
+
+
 %Acceptance probability
 
+For the acceptance probability, we then have that 
 
+\begin{align}
+    \alpha = min \Bigg(1,  \frac{
+    f(\beta_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|t_1, x)}{f(\beta_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|t_1, x)}
+    \cdot 
+    \frac{Q(\beta_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | t_1, x, \beta_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | t_1, x, \beta_{old})} \Bigg) \\
+    = min \Bigg(1, \frac{ exp \Big( -\lambda_0 \beta_{new} +\lambda_1 \beta_{new}  \Big)}{ exp \Big( -\lambda_0 \beta_{old} +\lambda_1 \beta_{old} \Big)} 
+    \cdot \frac{ exp \Big(  -\lambda_0 \beta_{new} + \lambda_1 \beta_{new}  -\frac{1}{2} \frac{(\widetilde{\beta}_{new}-\beta_{new})^2}{\sigma_{\beta}^2} \Big)}{ exp \Big(  -\lambda_0 \beta_{old}  + \lambda_1 \beta_{old}  -\frac{1}{2} \frac{(\widetilde{\beta}_{old}-\beta_{old})^2}{\sigma_{\beta}^2} \Big)}  \Bigg).
+\end{align}
 
 
 
 
 %input the code for the algorithm. Remember to clean the code for all print statements. 
-
+\todo[inline]{sette inn koden for algoritmen}
 \todo[inline]{Sette inn og kommentere figurer her. }
 
 
