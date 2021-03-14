@@ -63,7 +63,8 @@ data[, date_shifted := date- data[1, date]]
 
 
 q <- ggplot(data = data, aes(x = date, y = cum_event))
-q <- q + geom_line()
+q <- q + geom_line() + ggtitle("Cumulative plot of no. of accidents between 1851 and 1962") + 
+  xlab("Year") + ylab("Number of accidents with 10 or more casualties")
 q
 
 q <- ggplot(data = data, aes(x = date_shifted, y = cum_event))
@@ -78,7 +79,7 @@ lambda_1 <- 5
 beta = 3
 
 # Set n, t_0, t_2 and tuning parameter sigma
-n = 10000
+n = 5000
 t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963? 
 sigma = 3
