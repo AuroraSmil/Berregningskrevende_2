@@ -1,5 +1,17 @@
 \section{INLA for Gaussian Data}
 
+- It is a latent gausian model, these are a subclass of the structured additive regression models - > y belongs to the exponential family. In addition all latent variabler have gausian priors. 
+
+%Dette er structured additiv model
+\begin{equation}
+\begin{split}
+    g(\mu_i) = \eta_i = \alpha + \sum_{k = 1}^{n_\beta} \beta_k z_{mi} + \sum_{j = 1}^{n_f}f^{(j)}(u_{ji}) + \epsilon_i
+\end{split}
+\end{equation}
+
+- i tillegg må the latent field være cond indep, i vårt tilfelle være $\eta_i$ ene
+- siste punkt er få hyperparametere
+
 \subsection{Plotting the data}
 
 \subsection{Latent Gaussian model, and the possibility of using INLA to estimate the parameters in the model}
