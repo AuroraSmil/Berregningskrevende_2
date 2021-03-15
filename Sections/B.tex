@@ -58,26 +58,40 @@ Then, for the second block proposal we propose a new value for the $\eta$-vector
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_mcmc.pdf}
-    \caption{Caption}
+    \caption{Plot of the estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$.}
     \label{fig:post_theta_mcmc}
 \end{figure}
 
 \subsubsection{Estimate of the smooth effect using the mean and pointwise a $95 \%$ confidence bound around the mean}
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{Images/post_eta_mcmc.pdf}
-    \caption{Caption}
+    \caption{Plot of the mean and the $95\%$ credible interval for the smoothing parameter $\eta$. }
     \label{fig:post_eta_mcmc}
 \end{figure}
 
 \subsection{Approximating the posterior marginal for the hyperparameter $\theta$, $\pi(\theta|y)$ using the INLA scheme}
- - legg inn plot 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{Images/post_theta_inla.pdf}
+    \caption{Plot of the estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$ using the INLA scheme.}
+    \label{fig:post_theta_inla}
+\end{figure}
  
  
 \subsubsection{Approximation for $\pi(\theta|y)$}
-- veldig mye av disse tingene står som kladd i de pdf ene jeg sendte deg så se gjerne der for inspirasjon- 
+
+
+- veldig mye av disse tingene står som kladd i de pdf ene jeg sendte deg så se gjerne der for inspirasjon-
+
+
 \subsection{Implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$}
-- plot
+
+
+
+
+
 \subsection{Using the inla() - function in R to implement the model,and comparing the results}
 -plot 
 
