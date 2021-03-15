@@ -12,15 +12,16 @@ data[, x := seq(1:nrow(data))]
 setnames(data, "V1", "value")
 head(data)
 
+
 # Plot the data
 q <- ggplot(data, aes(x, value))
 q <- q + geom_point()
-q <- q + ggtitle("Gaussian data")
+q <- q + labs(title = "Gaussian data", x = "x",  y = "Value")
 q
 
 ggsave(
   "gaussian_data.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
@@ -146,13 +147,13 @@ q <- q + geom_point()+
   geom_errorbar(aes(ymin=q_lower, ymax=q_upper), width=.2,
                 position=position_dodge(0.05))
 q <- q + xlab("eta")
-q <- q + xlab("value")
+q <- q + ylab("value")
 q <- q + ggtitle("Mean and 95 % credible interval for the smoothing parameter")
 q
 
 ggsave(
   "post_eta_mcmc.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
@@ -205,6 +206,15 @@ q <- q + geom_point(aes(x =x, y =post_theta ))
 q <- q + geom_vline(xintercept = 1.75)
 q
 
+
+ggsave(
+  "post_theta_inla",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
 ###### last inla step
 
 theta_grid
@@ -234,7 +244,7 @@ eta <- as.data.table(results)[, density_total := rowSums(.SD)][]
 eta[, grid:= eta_grid]
 plot(eta_grid, eta$density_total)
 
-q <- ggplot(post_data_MC, aes(x = V11))
+q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q
 q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
@@ -272,17 +282,28 @@ q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V1))
 q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
 q <- q + geom_vline(xintercept = 1.75)
 q <- q + geom_line(data = as.data.table(precision), aes(x =x, y = y , colour = "INLA"))
-q <- q + geom_point(data = data_post, aes(x =x, y = post_theta *0.25*10^ 9, colour = "INLA_malually"))
+q <- q + geom_point(data = data_post, aes(x =x, y = post_theta *0.25*10^ 9, colour = "INLA_manually"))
 q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6)
 q
 
 
+ggsave(
+  "theta_comparison.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+#View(posterior_dist_MC)
+
 eta_10_inla<- result$marginals.random$t$index.10
 
 
-q <- ggplot(post_data_MC, aes(x = V11))
-q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
+q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
 q
-q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
-q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y ))
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7, colour = "INLA"))
+q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y , colour = "INLA_manually"))
 q
+
