@@ -208,7 +208,7 @@ q
 
 
 ggsave(
-  "post_theta_inla",
+  "post_theta_inla.pdf",
   path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
@@ -251,10 +251,18 @@ q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
 q
 
 
+
+ggsave(
+  "post_eta_inla.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
 q <- ggplot(data = eta, aes(x = eta_grid, y = density_total))
 q <- q + geom_point()
 q
-
 
 
 ##### INLA
@@ -278,14 +286,31 @@ precision <- result$marginals.hyperpar$`Precision for t`
 
 
 
+
+q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V1))
+q <- q + geom_line(data = as.data.table(precision), aes(x =x, y = y , colour = "INLA"))
+q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6) + xlab("x") + ylab("theta")
+q
+
+
+
+
+ggsave(
+  "R_inla_theta.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V1))
 q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
 q <- q + geom_vline(xintercept = 1.75)
 q <- q + geom_line(data = as.data.table(precision), aes(x =x, y = y , colour = "INLA"))
 q <- q + geom_point(data = data_post, aes(x =x, y = post_theta *0.25*10^ 9, colour = "INLA_manually"))
-q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6)
+q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6) + xlab("x") + ylab("theta")
 q
-
 
 ggsave(
   "theta_comparison.pdf",
@@ -295,15 +320,34 @@ ggsave(
   units = "cm"
 )
 
-#View(posterior_dist_MC)
-
 eta_10_inla<- result$marginals.random$t$index.10
 
+q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7, colour = "INLA")) + 
+   xlab("x") + ylab("eta")
+q
+
+
+ggsave(
+  "R_inla_eta.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
 q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
-q
 q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7, colour = "INLA"))
-q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y , colour = "INLA_manually"))
+q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y , colour = "INLA_manually")) +
+  xlab("x") + ylab("eta")
 q
+
+ggsave(
+  "smoothing_comparison.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
