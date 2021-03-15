@@ -85,6 +85,7 @@ lambda_0 <- 10
 lambda_1 <- 5 
 beta = 3
 
+
 # Set n, t_0, t_2 and tuning parameter sigma
 n = 10000
 t_0 = data[1, date]
@@ -97,20 +98,28 @@ sim_MH_single <- MH_single_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sig
 #Format and plot the reuslts
 sim_MH_single <- as.data.table(sim_MH_single)
 setnames(sim_MH_single, c("t", "lambda_0", "lambda_1", "beta", "a"))
-sim_MH_single[, itteration := seq(1:n)]
+sim_MH_single[, iteration := seq(1:n)]
 
-q <- ggplot(data = sim_MH_single, aes(x = itteration) )
+q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
 q
-q <- ggplot(data = sim_MH_single, aes(x = itteration) )
+q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
 q
-q <- ggplot(data = sim_MH_single, aes(x = itteration) )
+q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = beta, colour = "beta"))
 q
-q <- ggplot(data = sim_MH_single, aes(x = itteration) )
+q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
 q
+
+ggsave(
+  "sim_t.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
 # Check if values seem reasonable
 summary(sim_MH_single)
