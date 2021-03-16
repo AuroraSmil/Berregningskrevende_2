@@ -79,7 +79,6 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
         y_1_n = sum(data[date>= t_new]$event)
         
         #gibbs step
-        #t <- rexp(1, 1/(lambda_0 - lambda_1)) #must be wrong! 
         lambda_0_old <- results[i-1, 2]
         lambda_1_old <- results[i-1, 3]
         lambda_0 <- rgamma(1, (y_0 +2), scale= (1/(t_new - t_0 + 1/beta)))
@@ -131,7 +130,6 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
           f_target_2(lambda_0_old, lambda_1_old, beta_old, t_0, t_2, t, y_0, y_1)
         
         
-        # THIS ONE RETURNS 0 AND MAKES EVERYTHING CRASH
         
         prop_ratio <- f_prop_2(lambda_0_old, lambda_1_old, beta_cur = beta_old, beta_given = beta_new, t = t, t_0 = t_0, t_2 = t_2, y_0, y_1, sigma_beta = sigma_beta)/
           f_prop_2(lambda_0, lambda_1, beta_cur = beta_new, beta_given = beta_old, t_0 = t_0, t_2 = t_2, t = t, y_0, y_1, sigma_beta = sigma_beta)
