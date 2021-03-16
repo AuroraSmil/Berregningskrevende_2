@@ -10,58 +10,62 @@ In this section we will look at the smoothing of a time series and how to use in
     \label{fig:gaussian_data}
 \end{figure}
 
-In Figure \ref{fig:gaussian_data} vi can see the Gaussian data we want to find the underlying distribution of. We note that it looks like some of the previous values influence the next value in the time series. 
+In Figure \ref{fig:gaussian_data} vi can see the Gaussian data we want to find the underlying distribution of. We note that it looks like some of the previous values influence the next value in the time series. From the provided data, we have observations for $t = 1,...,20$, and this is what we will be using for the duration of this problem. 
 
 
 \subsection{Latent Gaussian model}
 
-As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_T)$ the observations $y_k$ are independent and Gaussian distributed, having mean $\eta_t$. The known unit variance is $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,T$, and there is a smooth effect of time which the linear predictor is linked to, $\eta_t = f_t$. 
+As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_{20})$ the observations $y_k$ are independent and Gaussian distributed, having mean $\eta_t$. The known unit variance is $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,20$, and there is a smooth effect of time which the linear predictor is linked to, $\eta_t = f_t$. 
 
-We are choosing a second order Random Walk model as the prior distribution for the vector \textbf{f} $= (f_1,...,f_T)$ model the temporal effects of the covariates. As $\eta_t = f_t$, we have that 
+We are choosing a second order Random Walk model as the prior distribution for the vector \textbf{f} $= (f_1,...,f_{20})$ model the temporal effects of the covariates. As $\eta_t = f_t$, we have that 
 
-\begin{align} [\label{RW_prior}]
-    \pi(\textbf{f}|\theta) = \pi(\textbf{\eta}|\theta) \propto
-    \theta^{(T-2/2)} \text{exp} \Bigg{  -\frac{\theta}{2} \sum_{t = 3}^T (f_t - 2f_{t-1} + f_{t-2})^2  \Bigg} = \mathcal{N}(\textbf{0}, \textbf{Q}(\theta)^{-1}).
-\end{align}
-
-To find the precision matrix for our model, we expand the expression for $\textbf{Q}(\theta)$ from \ref{RW_prior}. We then have that 
-
-\begin{align}
-    \textbf{Q}(\theta) = \sum_{t = 3}^T (f_t - 2f_{t-1} + f_{t-2})^2
+\begin{align} \label{RW_prior}
+    \pi(\mathbf{f}|\theta) = \pi(\mathbf{\eta}|\theta) \propto
+    \theta^{(T-2/2)} \text{exp} \Bigg\{  -\frac{\theta}{2} \sum_{t = 3}^{20} (f_t - 2f_{t-1} + f_{t-2})^2  \Bigg\} = \mathcal{N}(\mathbf{0}, \mathbf{Q}(\theta)^{-1}).
 \end{align}
 
 
+To find the precision matrix for our model, we expand the expression for $\textbf{Q}(\theta)$ from equation \ref{RW_prior}. We then have that 
 
+\begin{align} \label{precision_mat}
+    \textbf{Q}(\theta) = \sum_{t = 3}^{20} (f_t - 2f_{t-1} + f_{t-2})^2 \nonumber \\
+    = \sum_{t = 3}^{20} (f_t^2 + 4f_{t-1}^2 + f_{t-2}^2 - 4f_t f_{t-1} - 4 f_{t-1} f_{t-2} + 2f_t f_{t-2}) \nonumber \\
+    = ... = 
+    \begin{bmatrix}
+        1 & -2 & 1 & . & . & . & . & . \\
+        -2 & 5 & -4 & 1 & . & . & . & .  \\
+        1 & -4 & 6 & -4 & 1 & . & . &  . \\
+        . & 1 & -4 & 6 & -4 & 1 & . & . \\
+        . & . & 1 & -4 & 6 & -4 & 1 & . \\
+        . & . & . & 1 & -4 & 6 & -4 & 1 \\
+        . & . & . & . & 1& -4& 5 & -2 \\
+        . & . & . & . & . & 1 & -2 & 1 
+    \end{bmatrix}.
+\end{align}
 
+This is a sparse matrix. As the precision matrix is sparse, and we assume the latent model to be Gaussian, this is a Gaussian Markov Random Field (GMRF). 
 
-
-- Skriv inn modellene fra oppgaveteksten 
-
-- skriv in hva pressicion matrixen Q blir, det gjør det tydeligere at det er en GMRF siden den er sparse
 
 \todo[color = yellow]{Hvis du fokuserer på å få inn alle plottene og skrive innn likningene så kan jeg vet skrive forståelsestingene på tirsdag. I hvert fall er g6t5fr5det fint om du tar det i den rekkefølgen :D  }
 
-- forklar at det er en Gaussian latent model og GMRF
 
-- It is a latent gausian model, these are a subclass of the structured additive regression models - > y belongs to the exponential family. In addition all latent variabler have gausian priors. 
+
+A structured additive model can be defined as 
 
 %Dette er structured additiv model
-\begin{equation}
+\begin{equation} 
 \begin{split}
-    g(\mu_i) = \eta_i = \alpha + \sum_{k = 1}^{n_\beta} \beta_k z_{mi} + \sum_{j = 1}^{n_f}f^{(j)}(u_{ji}) + \epsilon_i
+    g(\mu_i) = \eta_i = \alpha + \sum_{k = 1}^{n_\beta} \beta_k z_{mi} + \sum_{j = 1}^{n_f}f^{(j)}(u_{ji}) + \epsilon_i.
 \end{split}
 \end{equation}
 
-- i tillegg må the latent field være cond indep, i vårt tilfelle være $\eta_i$ ene
-- siste punkt er få hyperparametere
+As our model is a latent Gaussian model, and these are a subclass of the structured additive regression model, then $y$ belongs to the exponential family. In addition, all latent variables have Gaussian priors. In addition to this, the latent field has to be conditionally independent, and our model is conditionally independent given the $\eta$-vector. As all this is fulfilled in our model, along with the requirement that there are few hyperparameters, we can use INLA to estimate the model parameters. 
 
-
-
-%As $f|\theta$ is Gaussian distributed with mean $0$ and precision matrix $\textbf{Q}(\theta)$, we need to define the precision matrix of the model in order to use INLA. The precision matrix is defined as 
 
 
 
 \subsection{Gibbs sampling algorithm for $f(\eta, \theta |y)$}
+\label{Gibbs}
 
 First we implement a Gibbs sampling algorithm for $f(\eta, \theta |y)$. To do so we need the full conditional of both $\pi(\theta|\eta, y)$ and $\pi(\eta|\theta, y)$. They are:
 
@@ -69,16 +73,20 @@ First we implement a Gibbs sampling algorithm for $f(\eta, \theta |y)$. To do so
 
 \begin{align}
     \pi(\theta| \eta, y) = \pi(y|\eta) \cdot \pi(\eta|\theta) \cdot \pi(\theta) \propto \pi(\eta|\theta) \cdot \pi(\theta) \nonumber \\
-    = \theta^{\frac{(T-2)}{2}} \cdot exp \Big( \eta^T Q \frac{\theta}{2} \eta \Big) \cdot exp(\theta) \nonumber \\
-    = exp \Big(  \theta \big(1 + \frac{\eta^T Q \eta}{2}  \big) \theta^{\frac{(T-2)}{2}}  \Big), 
+    = \theta^{\frac{(T-2)}{2}} \cdot \text{exp} \Big( \eta^T Q \frac{\theta}{2} \eta \Big) \cdot \text{exp}(\theta) \nonumber \\
+    = \text{exp} \Big(  \theta \big(1 + \frac{\eta^T Q \eta}{2}  \big) \theta^{\frac{(T-2)}{2}}  \Big), 
 \end{align}
 
 and 
 \begin{align}
-    \pi(\eta | \theta, y) = 
+    \pi(\eta | \theta, y) \propto f(\mathbf{f}|\mathbf{\eta}) \cdot f(\mathbf{\eta}|\theta) \nonumber \\
+    \propto \text{exp} \Bigg\{ -\frac{1}{2}(\mathbf{y} - \mathbf{\eta})^T I (\mathbf{y}-\mathbf{\eta}) - \frac{1}{2} \mathbf{\eta}^T Q \mathbf{\eta} \Bigg\} \nonumber \\
+    = \text{exp} \Bigg\{  -\frac{1}{2} \Big[ (\eta - a)^T (I - Q) (\eta - a) \Big] \Bigg\}, 
 \end{align}
 
-We note that the full conditional for $\theta$ is a gamma distributed with shape parameter $\alpha = T/2$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ and the full conditional for $\eta$ is multivariate normal distributed with mean $\boldsymbol{\mu} = \boldsymbol{y}(I + Q \theta)^{-1}$ and variance covariance matrix given by $\Sigma = (I + Q \theta)^{-1}$. $Q$ is teh precision matrix defined in ....
+with $a = y(I + Q \theta)^{-1}$ and $\sum = (I + Q \theta)^{-1}$. 
+
+We note that the full conditional for $\theta$ is a gamma distributed with shape parameter $\alpha = T/2$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ and the full conditional for $\eta$ is multivariate normal distributed with mean $\boldsymbol{\mu} = \boldsymbol{y}(I + Q \theta)^{-1}$ and variance covariance matrix given by $\Sigma = (I + Q \theta)^{-1}$. $Q$ is the precision matrix defined in  \ref{precision_mat}....
 $I$ is the identity matrix and $y$ are the values of the dataset for each time as seen in Figure \ref{fig:gaussian_data}. 
 
 
@@ -92,10 +100,21 @@ We run with initial values for $\theta = 0$ and $\eta$ a random sample from the 
 
 \lstinputlisting[language=R, firstline=88, lastline=100]{Code/INLA.R}
 
-Since this is a MCMC algorithm we nee dto evaluate the burn in period. 
+Since this is an MCMC algorithm we need to evaluate the burn in period. 
 
+\begin{figure}
+    \centering
+    \includegraphics[width = \textwidth]{Images/trace_theta_mcmc.pdf}
+    \caption{Traceplot for $\theta$ using Gibbs sampling}
+    \label{fig:trace_theta}
+\end{figure}
 
+We can see from Figure \ref{fig:trace_theta} that the algorithme seems to converge very fast. It has one spike around $itteration= 7000$ so we decide to descard the first $10 000$ samples. When we explore the traceplot for all $\eta_i$ non of them has a longer burn in period and all seem to converge very fast. This is also as expected since the Gibbs sample draws from the actual full conditional. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$}
+
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_mcmc.pdf}
@@ -103,7 +122,12 @@ Since this is a MCMC algorithm we nee dto evaluate the burn in period.
     \label{fig:post_theta_mcmc}
 \end{figure}
 
+After discarding the burn in period we get the posterior distribution for $\pi(\theta|y)$. This can be seen in Figure \ref{fig:post_theta_mcmc}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estimate of the smooth effect using the mean and pointwise a $95 \%$ confidence bound around the mean}
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{Images/post_eta_mcmc.pdf}
@@ -111,23 +135,63 @@ Since this is a MCMC algorithm we nee dto evaluate the burn in period.
     \label{fig:post_eta_mcmc}
 \end{figure}
 
-\subsection{Approximating the posterior marginal for the hyperparameter $\theta$, $\pi(\theta|y)$ using the INLA scheme}
+We can also look at the mean and $95 \%$ credible intervals. This can be seen in Figure \ref{fig:post_eta_mcmc}.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Approximating the posterior marginal for the hyperparameter $\theta$, $\pi(\theta|y)$ using the INLA scheme}
+\label{theta_post_inla}
+
+We now want to use the INLA scheme to fint the posterior for $\pi\theta| \boldsymbol{y})$ and $\pi(\eta_i| \boldsymbol{y})$ for all $i$.
+
+- Sett inn likningn fra opgaven
+
+We see that we need the $pi(\boldsymbol{y}| \eta, \theta$ which is a multivariate normal. 
+We need $\pi(\theta, \eta)$. This is given by 
+
+- sett inn utregning for dette
+
+We note this is a gamma distribution with rate parameter $\alpha = 1$ and scale parameter $\beta = \frac{1}{1 + \frac{1}{2} \eta^{T} Q \eta}$
+
+Lastly we need $\pi(\eta| \theta \boldsymbol{y})$ which we calculated in part \ref{Gibbs} to be a gamma distribution with rate, $\alpha = \frac{T}{2}$ ans scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ 
+
+We constuct a grid for values of $\theta$ chose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
+
+\lstinputlisting[language=R, firstline=177, lastline=186]{Code/INLA.R}
+
+\lstinputlisting[language=R, firstline=188, lastline=197]{Code/INLA.R}
+
+We now have the approximation for the porsterior density of $\theta$.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_inla.pdf}
     \caption{Plot of the estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$ using the INLA scheme.}
     \label{fig:post_theta_inla}
 \end{figure}
- 
- 
-\subsubsection{Approximation for $\pi(\theta|y)$}
 
+Figure \ref{fig:post_theta_inla} shows the posterior distribution computed by INLA. We note that this should be multiplied by a normalizing constant. However this will only shift the values of the density not the shape. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-- veldig mye av disse tingene står som kladd i de pdf ene jeg sendte deg så se gjerne der for inspirasjon-
+\subsubsection{Implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$}
 
+We now want to preform tha last inla step, implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$ We will do this only for $\eta_{10}$. 
 
-\subsection{Implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$}
+We know 
+
+\begin{equation}
+\label{eq:eta_post}
+    \pi(\eta|\boldsymbol{y}) = \int \pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y}) d\theta.
+\end{equation}
+
+In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y})$ for a grid of eta values for all values in the $\theta$-grid from Section \ref{theta_post_inla}. We use the values for $\pi(\theta|\boldsymbol{y})$ computed earlier. Finaly we sum all the weighted densities for $\pi(\eta|\boldsymbol{y}, \theta)$ weighted by $\pi(\theta|\boldsymbol{y})$
+\lstinputlisting[language=R, firstline=221, lastline=227]{Code/INLA.R}
+
+\lstinputlisting[language=R, firstline=232, lastline=240]{Code/INLA.R}
+
+\lstinputlisting[language=R, firstline=244, lastline=244]{Code/INLA.R}
+
 
 \begin{figure}[h!]
     \centering
@@ -138,6 +202,8 @@ Since this is a MCMC algorithm we nee dto evaluate the burn in period.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using the inla() - function in R to implement the model,and comparing the results}
 
 
