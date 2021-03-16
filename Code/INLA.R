@@ -102,7 +102,7 @@ q <- ggplot(data = as.data.table(posterior_dist_MC[1:25000,]), aes(x = 1:25000) 
 q <- q + geom_line(aes(y = V1))
 q <- q + ylab(unname(TeX(c("$\\theta$")))) +
   ggtitle(unname(TeX("Traceplot for MCMC samples of theta $\\theta$"))) +
-  xlab("Itteration")
+  xlab("Iteration")
 q
 
 ggsave(
@@ -236,7 +236,7 @@ for (i in seq_along(results)){
   mu_i <- mu[j]
   density <- dnorm(eta_grid, mu_i, sigma_i)
   points(eta_grid, density)
-  results[[i]] <- as.data.table(density)* post_theta[[i]][1] #her er feilen den ganger inn to tall
+  results[[i]] <- as.data.table(density)* post_theta[[i]][1] 
 }
 
 dev.off()
@@ -246,12 +246,11 @@ eta[, grid:= eta_grid]
 plot(eta_grid, eta$density_total)
 
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
-q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*0.9*10^7, colour = "INLA_manualy"))
+q <- q + xlab(unname(TeX(c("$\\eta_{10}$"))))
+q <- q + ylab("Density") + ggtitle(unname(TeX(c("Posterior density for $\\eta_{10}$"))))
 q
-q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7))
-q
-
-
 
 ggsave(
   "post_eta_inla.pdf",
@@ -269,31 +268,22 @@ q
 ##### INLA
 library(INLA)
 data <- as.data.table(read.delim("code/Gaussiandata.txt", header = FALSE))
-data
 data[, t := seq(1:nrow(data))]
-data
-
 setnames(data, "V1", "value")
-data
 
 formula  = value ~ -1 + f(t, model = "rw2", hyper = list(prec = list(prior = "loggamma", param = c(1,1))))
 result  = inla(formula = formula, family = "gaussian",
                data = data, 
                verbose = TRUE)
 
-
 precision <- result$marginals.hyperpar$`Precision for t`
-
-
-
+eta_10_inla<- result$marginals.random$t$index.10
 
 
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V1))
 q <- q + geom_line(data = as.data.table(precision), aes(x =x, y = y , colour = "INLA"))
-q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6) + xlab("x") + ylab("theta")
+q <- q + xlim(0, 6) + xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
 q
-
-
 
 
 ggsave(
@@ -310,7 +300,7 @@ q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
 q <- q + geom_vline(xintercept = 1.75)
 q <- q + geom_line(data = as.data.table(precision), aes(x =x, y = y , colour = "INLA"))
 q <- q + geom_point(data = data_post, aes(x =x, y = post_theta *0.25*10^ 9, colour = "INLA_manually"))
-q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6) + xlab("x") + ylab("theta")
+q <- q + geom_vline(xintercept = 0.66) + xlim(0, 6) + xlab(unname(TeX(c("$\\theta$")))) + ylab("Density")
 q
 
 ggsave(
@@ -321,10 +311,8 @@ ggsave(
   units = "cm"
 )
 
-eta_10_inla<- result$marginals.random$t$index.10
-
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
-q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7, colour = "INLA")) + 
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*0.9*10^7, colour = "INLA")) + 
    xlab("x") + ylab("eta")
 q
 
@@ -339,9 +327,9 @@ ggsave(
 
 q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
 q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
-q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*10^7, colour = "INLA"))
-q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y , colour = "INLA_manually")) +
-  xlab("x") + ylab("eta")
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*0.9*10^7, colour = "INLA_manually"))
+q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x, y = y , colour = "INLA")) +
+  xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
 q
 
 ggsave(
@@ -352,3 +340,41 @@ ggsave(
   units = "cm"
 )
 
+
+q <- ggplot(as.data.table(posterior_dist_MC), aes(x = V11))
+q <- q + geom_histogram(aes(y = ..density.., colour = "MCMC"), bins = 100)
+q <- q + geom_point(data = eta, aes(x = eta_grid, y = density_total*0.9*10^7, colour = "INLA_manually"))
+q <- q + geom_line(data = as.data.table(eta_10_inla), aes(x =x + 0.65, y = y , colour = "INLA")) +
+  xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
+q
+
+ggsave(
+  "smoothing_comparison_shifted.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+post_eta_mcmc_aggregated[, group := "MCMC"]
+post_eta_inla_summary <- as.data.table(result$summary.random)[, .(t.ID, t.mean, t.0.025quant, t.0.975quant)]
+post_eta_inla_summary[, group := "INLA"]
+
+post_eta_total <- rbindlist(list(post_eta_mcmc_aggregated, post_eta_inla_summary))
+
+q <- ggplot(post_eta_total, aes(x = as.factor(variable), y = mean, group = group, colour = group))
+q <- q + geom_point()+
+  geom_errorbar(aes(ymin=q_lower, ymax=q_upper), width=.2,
+                position=position_dodge(0.3))
+q <- q + xlab(unname(TeX(c("$\\eta$"))))
+q <- q + ylab("value")
+q <- q + ggtitle("Mean and 95 % credible interval for the smoothing parameter")
+q
+
+ggsave(
+  "smoothing_comparison_all eta.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
