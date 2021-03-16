@@ -135,11 +135,7 @@ q
 
 ggsave(
   "sim_lambda0.pdf",
-<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
-=======
-  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
->>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
@@ -155,11 +151,7 @@ q
 
 ggsave(
   "sim_lambda1.pdf",
-<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
-=======
-  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
->>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
@@ -175,19 +167,12 @@ q
 
 ggsave(
   "sim_beta.pdf",
-<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
-=======
-  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
->>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
 )
-<<<<<<< HEAD
-=======
 
->>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
 q <- q +  theme(legend.position = "none")
