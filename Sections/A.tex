@@ -402,10 +402,43 @@ For the acceptance probability, we then have that
 
 The code for the algorithm is 
 
-\todo[inline]{sette inn koden for algoritmen}
+
+
+
+\lstinputlisting[language=R, firstline=3, lastline=150]{Code/MH_block.R}
+
+
 \todo[inline]{Sette inn og kommentere figurer her. }
 
-\lstinputlisting[language=R, firstline=3, lastline=152]{Code/MH_block.R}
+The trace plots for the MCMC-algorithm with block Metropolis-Hastings steps are shown in figure \ref{}. 
+
+\begin{figure}
+    \centering
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics{}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \caption{Trace plots for $n = 10000$ simulations of the different parameters with the block MCMC algorithm. The initial values used are the same as for single site MCMC, namely $\lambda_0 = 10, \lambda_1 = 5, \beta = 3}$ and $t_1 = 45$, and the tuning parameters used are $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$
+    \label{fig:sigma_t}
+\end{figure}
+
+
 
 
 \subsection{The block Metropolitan-Hastings algorithm for different values of the tuning parameter}
