@@ -151,15 +151,15 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
 
 
 
-t =45
+t = data[1, date] + 45
 
 lambda_0 <- 10
 lambda_1 <-  5
 beta = 3
 
 n = 10000
-t_0 = 0
-t_2 = 112 #maybe should be 1963? 
+t_0 = data[1, date]
+t_2 = data[nrow(data), date] #maybe should be 1963? 
 sigma_t = 3
 sigma_beta = 0.3
 
@@ -217,7 +217,7 @@ q <- q + ggtitle(unname(TeX(c("Traceplot for $\\beta$"))))
 q
 
 ggsave(
-  "block_sim_beta.pdf",
+  "block_sim_beta_sigma3.pdf",
   path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
@@ -226,13 +226,14 @@ ggsave(
 
 q <- ggplot(data = sim_MH, aes(x = itteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
+q <- q +  theme(legend.position = "none")
 q <- q + ylab("t")
 q <- q + xlab("Iteration")
 q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
 q
 
 ggsave(
-  "block_sim_t.pdf",
+  "block_sim_t_sigma03.pdf",
   path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
@@ -248,8 +249,14 @@ ggsave(
 summary(sim_MH)
 3*41 + 0.92*(112-41)
 
-burnin <- 5000
 
-sim_t <- sim_MH$t[burnin:n]
+
+burnin <- 500
+
+sim_t <- sim_MH_single$t[burnin:n]
 
 acf(sim_t)
+
+no_burnin_sim_MH <- sim_MH_single[burnin:n]
+
+summary(no_burnin_sim_MH)
