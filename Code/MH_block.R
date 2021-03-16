@@ -137,17 +137,6 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
           f_prop_2(lambda_0, lambda_1, beta_cur = beta_new, beta_given = beta_old, t_0 = t_0, t_2 = t_2, t = t, y_0, y_1, sigma_beta = sigma_beta)
         
         
-        
-        
-        # prop_ratio <- (dgamma(lambda_0_old, (y_0 +2), scale= (1/(t - t_0 + 1/beta_old)))*
-        #   dgamma(lambda_1_old, (y_1+2), scale= (1/(t_2 - t + 1/beta_old)))*
-        #   dgamma(beta_old,  6, scale = 1/(lambda_0_old + lambda_1_old + 1)))/
-        #   (dgamma(lambda_0_n, (y_0 +2 ), scale= (1/(t - t_0 + 1/beta_new)))*
-        #   dgamma(lambda_1_n, (y_1 +2 ), scale= (1/(t_2 - t+ 1/beta_new)))*
-        #   dgamma(beta_new,  6, scale = 1/(lambda_0_n + lambda_1_n + 1)))
-
-        
-        #print(target_ratio)
         a <- min(1, target_ratio*prop_ratio)
         u <- runif(1)
         if (u< a){
