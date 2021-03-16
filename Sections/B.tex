@@ -186,12 +186,22 @@ We know
 \end{equation}
 
 In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y})$ for a grid of eta values for all values in the $\theta$-grid from Section \ref{theta_post_inla}. We use the values for $\pi(\theta|\boldsymbol{y})$ computed earlier. Finaly we sum all the weighted densities for $\pi(\eta|\boldsymbol{y}, \theta)$ weighted by $\pi(\theta|\boldsymbol{y})$
+
 \lstinputlisting[language=R, firstline=221, lastline=227]{Code/INLA.R}
 
 \lstinputlisting[language=R, firstline=232, lastline=240]{Code/INLA.R}
 
 \lstinputlisting[language=R, firstline=244, lastline=244]{Code/INLA.R}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{Images/eta_10.pdf}
+    \caption{All distributions of $\eta_{10}$ given $\theta$ from the grid as given in Section \ref{theta_post_inla}}
+    \label{fig:eta_all}
+\end{figure}
+
+
+In Figure \ref{fig:eta_all} we can see all $\pi(\eta_{10}|\theta, \boldsymbol{y})$. To get  $\pi(\eta_{10}|\theta)$ we sum them all weighted by $\pi(\theta|\boldsymbol{y})$. 
 
 \begin{figure}[h!]
     \centering
@@ -200,7 +210,7 @@ In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y},
     \label{fig:post_eta_inla}
 \end{figure}
 
-
+This giver us the density seen in Figure \ref{fig:post_eta_inla} together with the posterior computed by the Gibbs sampler earlier. As we can see these do not completely overlap. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

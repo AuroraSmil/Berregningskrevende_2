@@ -34,7 +34,7 @@ The likelihood function for the observed data is given by,
 
 \begin{align}
     f(x|t_1,\lambda_1,\lambda_2) 
-    = exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k-1} - t_k) \prod_{k = 0}^1 \lambda_k^{y_k} \Big), 
+    = \text{exp} \Big( - \sum_{k = 0}^1 \lambda_k (t_{k-1} - t_k) \prod_{k = 0}^1 \lambda_k^{y_k} \Big), 
 \end{align}
 where $x$ is the observed data and $y_k$ is the number of observed disasters in the period $t_k$ to $t_{k+1}$. 
 
@@ -47,7 +47,7 @@ We assume $t_1$ to be apriori uniformly distributed on $[t_0, t_2]$, and $\lambd
 The hyper parameter $\beta$ follows the following improper distribution,
 
 \begin{align}
-    \pi (\beta) \propto \frac{exp\{ -\frac{1}{\beta} \} }{\beta} \textbf{ for } \beta > 0.
+    \pi (\beta) \propto \frac{\text{exp}\{ -\frac{1}{\beta} \} }{\beta} \textbf{ for } \beta > 0.
 \end{align}
 
 In total this gives us the following model parameters, $\boldsymbol{\theta} = (t_1, \lambda_0, \lambda_1, \beta)$. 
@@ -69,11 +69,11 @@ The likelihood $f(x | \boldsymbol{\theta})$ is given above, $\pi(\boldsymbol{\th
 Using this and the given likelihood, we find the posterior distribution for $f(\boldsymbol{\theta}|x)$
 
 \begin{align} \label{eq:post}
-    f(\boldsymbol{\theta}|x) \propto exp \Big( - \sum_{k = 0}^1 \lambda_k (t_{k+1} - t_k) \Big)\cdot \prod_{k = 0}^1 \lambda_k^{y_k} \cdot \frac{1}{t_2-t_0} 
+    f(\boldsymbol{\theta}|x) \propto \text{exp} \Big( - \sum_{k = 0}^1 \lambda_k (t_{k+1} - t_k) \Big)\cdot \prod_{k = 0}^1 \lambda_k^{y_k} \cdot \frac{1}{t_2-t_0} 
     \Big( \frac{1}{\beta^2} \lambda_0 \cdot
-    exp \Big({-\frac{\lambda_0}{\beta}} \Big)  \Big) \nonumber \\ 
-    \cdot \Big( \frac{1}{\beta^2} \lambda_1 \cdot exp \Big({-\frac{\lambda_1}{\beta}} \Big) \Big) \cdot exp \Big( -\frac{1}{\beta} \Big)/\beta \nonumber \\
-    \propto   \frac{1}{\beta^5} \cdot \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) - \lambda_0(t_1-t_0) - \lambda_1(t_2-t_1) \Big)
+    \text{exp} \Big({-\frac{\lambda_0}{\beta}} \Big)  \Big) \nonumber \\ 
+    \cdot \Big( \frac{1}{\beta^2} \lambda_1 \cdot \text{exp} \Big({-\frac{\lambda_1}{\beta}} \Big) \Big) \cdot \text{exp} \Big( -\frac{1}{\beta} \Big)/\beta \nonumber \\
+    \propto   \frac{1}{\beta^5} \cdot \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot \text{exp} \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) - \lambda_0(t_1-t_0) - \lambda_1(t_2-t_1) \Big)
 \end{align}
 
 
@@ -86,8 +86,8 @@ To find the full conditional for each of the elements in $\boldsymbol{\theta}$, 
 
 \begin{align}
     f(t_1 | \lambda_0, \lambda_1, \beta, x) \propto 
-    \lambda_0^{y_0 + 1} \lambda_1^{y_1 + 1} \cdot exp \Big( -\lambda_0(t_1 - t_0) - \lambda_1 (t_2 - t_1) \Big) \nonumber \\
-    \propto  \lambda_0^{y_0 + 1} \lambda_1^{y_1 + 1} \cdot exp \Big( -(\lambda_0 - \lambda_1)t_1 \Big).
+    \lambda_0^{y_0 + 1} \lambda_1^{y_1 + 1} \cdot \text{exp} \Big( -\lambda_0(t_1 - t_0) - \lambda_1 (t_2 - t_1) \Big) \nonumber \\
+    \propto  \lambda_0^{y_0 + 1} \lambda_1^{y_1 + 1} \cdot \text{exp} \Big( -(\lambda_0 - \lambda_1)t_1 \Big).
 \end{align}
 
 We do not recognize the expression for the full conditional of $t_1$ as belonging to a named distribution. 
@@ -96,13 +96,13 @@ The full conditional for $\lambda_0$ and $\lambda_1$ can also be found by using 
 
 \begin{align}
     f(\lambda_0 | \lambda_1, t_1, \beta, x) \propto
-    \lambda_0^{y_0 + 1}\cdot exp \Big( -\frac{1}{\beta} \lambda_0 - (t_1 - t_0)\lambda_0 \Big) 
+    \lambda_0^{y_0 + 1}\cdot \text{exp} \Big( -\frac{1}{\beta} \lambda_0 - (t_1 - t_0)\lambda_0 \Big) 
     \nonumber \\
-    \propto  \lambda_0^{y_0 + 1} \cdot exp \Big( - \lambda_0 (\frac{1}{\beta} + t_1 - t_0) \Big),
+    \propto  \lambda_0^{y_0 + 1} \cdot \text{exp} \Big( - \lambda_0 (\frac{1}{\beta} + t_1 - t_0) \Big),
      \\
     f(\lambda_1 | \lambda_0, t_1, \beta, x) \propto
-    \lambda_1^{y_1 + 1}\cdot exp \Big( -\frac{1}{\beta} \lambda_1 - (t_2 - t_1)\lambda_1 \Big) \nonumber \\
-    \propto  \lambda_1^{y_1 + 1} \cdot exp \Big( - \lambda_1 (\frac{1}{\beta} + t_2 - t_1) \Big),
+    \lambda_1^{y_1 + 1}\cdot \text{exp} \Big( -\frac{1}{\beta} \lambda_1 - (t_2 - t_1)\lambda_1 \Big) \nonumber \\
+    \propto  \lambda_1^{y_1 + 1} \cdot \text{exp} \Big( - \lambda_1 (\frac{1}{\beta} + t_2 - t_1) \Big),
 \end{align}
 and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed with rate, $\alpha$, and scale, $\beta$, parameters respectivly $\alpha_0 = y_0 + 2$, $\beta_0 = \frac{1}{\frac{1}{\beta} + t_1 - t_0}$, $\alpha_1 = y_1 + 2$, $\beta_1 = \frac{1}{\frac{1}{\beta} + t_2 - t_1}$. 
 
@@ -112,7 +112,7 @@ For the last parameter $\beta$, the full conditional is given by,
 
 \begin{align}
     f(\beta | \lambda_0, \lambda_1, t_1, x) \propto 
-    \frac{1}{\beta^5} \cdot exp \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) \Big),
+    \frac{1}{\beta^5} \cdot \text{exp} \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) \Big),
 \end{align}
 
 and we also recognize this as belonging to a gamma distribution with rate parameter $\alpha_{\beta} = 6$ and scale parameter $\beta_{\beta} = \frac{1}{\lambda_0 + \lambda_1 + 1} $. 
@@ -129,8 +129,8 @@ We then compute the acceptance probability for $t_{new}$
 
 \begin{align}
     \alpha(t_{new}|x) = min \Big( 1, \frac{f(t_{new}| \lambda_0, \lambda_1, \beta, x)}{f(t_{old}| \lambda_0, \lambda_1, \beta, x)} \Big) \nonumber \\ 
-    = min \Big( \frac{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} exp(-(\lambda_0 - \lambda_1)t_{new})}{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} exp(-(\lambda_0 - \lambda_1)t_{old})} \Big) \nonumber \\
-    = min \Big( 1, \frac{exp(-(\lambda_0 - \lambda_1)t_{new})}{exp(-(\lambda_0 - \lambda_1)t_{old})} \Big)
+    = min \Big( \frac{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{new})}{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{old})} \Big) \nonumber \\
+    = min \Big( 1, \frac{\text{exp}(-(\lambda_0 - \lambda_1)t_{new})}{\text{exp}(-(\lambda_0 - \lambda_1)t_{old})} \Big)
 \end{align}
 
 and accept or reject the proposed $t$. We note that since the proposal density is a random walk the proposal ration which usually is a part of the acceptance probability cancels out. 
@@ -316,7 +316,7 @@ We alternate between blocking together $t_1, \lambda_0$ and  $ \lambda_1$ and ke
 \todo[inline]{Introduser og skriv litt om target distribution her}
 % Target distribution.Introduser og skriv litt rundt denne. Er den helt rett? 
 \begin{align}
-    f(t_1, \lambda_0, \lambda_1|\beta, x) = exp \Big( -(t_1-t_0)\lambda_0 -(t_2-t_1)\lambda_1 - \frac{1}{\beta}(\lambda_0 - \lambda_1)\Big) \cdot\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} 
+    f(t_1, \lambda_0, \lambda_1|\beta, x) = \text{exp} \Big( -(t_1-t_0)\lambda_0 -(t_2-t_1)\lambda_1 - \frac{1}{\beta}(\lambda_0 - \lambda_1)\Big) \cdot\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} 
 \end{align}
 
 % Proposal distribution. Skriv om RW
@@ -324,7 +324,7 @@ We use a random walk proposal density, and the random walk proposal values are g
 
 \begin{align}
     Q(\widetilde{t_1}, \lambda_0, \lambda_1 |t) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(\widetilde{t_1}| t) \nonumber %\\
-    % = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot exp \Big(  -\lambda_0(\frac{1}{\beta} + \widetilde{t_1} - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - \widetilde{t_1})  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
+    % = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot \text{exp} \Big(  -\lambda_0(\frac{1}{\beta} + \widetilde{t_1} - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - \widetilde{t_1})  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
 \end{align}
 \todo[color = yellow]{Vi trenger ikke skrive ut det fulle uttrukket, det over holder. I tillegg er det som er kommentert ut ikke helt riktig husk at lamdaene også har nye og gamele verdier så nesten ingen ting kanselerer}
 
