@@ -170,6 +170,11 @@ q
 
 burnin <- 1000
 
+
 sim_t <- sim_MH_single$t[burnin:n]
 
 acf(sim_t)
+
+no_burnin_sim_MH <- sim_MH_single[burnin:n]
+
+summary(no_burnin_sim_MH)
