@@ -73,8 +73,8 @@ First we implement a Gibbs sampling algorithm for $f(\eta, \theta |y)$. To do so
 
 \begin{align}
     \pi(\theta| \eta, y) = \pi(y|\eta) \cdot \pi(\eta|\theta) \cdot \pi(\theta) \propto \pi(\eta|\theta) \cdot \pi(\theta) \nonumber \\
-    = \theta^{\frac{(T-2)}{2}} \cdot \text{exp} \Big( \eta^T Q \frac{\theta}{2} \eta \Big) \cdot \text{exp}(\theta) \nonumber \\
-    = \text{exp} \Big(  \theta \big(1 + \frac{\eta^T Q \eta}{2}  \big) \theta^{\frac{(T-2)}{2}}  \Big), 
+    = \theta^{\frac{(T-2)}{2}} \cdot \text{exp} \Big\{ \eta^T Q \frac{\theta}{2} \eta \Big\} \cdot \text{exp}(\theta) \nonumber \\
+    = \text{exp} \Big\{  \theta \big(1 + \frac{\eta^T Q \eta}{2}  \big) \theta^{\frac{(T-2)}{2}}  \Big\}, 
 \end{align}
 
 and 
@@ -109,7 +109,7 @@ Since this is an MCMC algorithm we need to evaluate the burn in period.
     \label{fig:trace_theta}
 \end{figure}
 
-We can see from Figure \ref{fig:trace_theta} that the algorithme seems to converge very fast. It has one spike around $itteration= 7000$ so we decide to descard the first $10 000$ samples. When we explore the traceplot for all $\eta_i$ non of them has a longer burn in period and all seem to converge very fast. This is also as expected since the Gibbs sample draws from the actual full conditional. 
+We can see from Figure \ref{fig:trace_theta} that the algorithm seems to converge very fast. It has one spike around $iteration= 7000$ so we decide to discard the first $10 000$ samples. When we explore the trace plot for all $\eta_i$ non of them has a longer burn in period and all seem to converge very fast. This is also as expected since the Gibbs sample draws from the actual full conditional. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,14 +143,34 @@ We can also look at the mean and $95 \%$ credible intervals. This can be seen in
 \subsection{Approximating the posterior marginal for the hyperparameter $\theta$, $\pi(\theta|y)$ using the INLA scheme}
 \label{theta_post_inla}
 
-We now want to use the INLA scheme to fint the posterior for $\pi\theta| \boldsymbol{y})$ and $\pi(\eta_i| \boldsymbol{y})$ for all $i$.
+We now want to use the INLA scheme to find the posterior for $\pi\theta| \boldsymbol{y})$ and $\pi(\eta_i| \boldsymbol{y})$ for all $i$.
 
 - Sett inn likningn fra opgaven
 
-We see that we need the $pi(\boldsymbol{y}| \eta, \theta$ which is a multivariate normal. 
-We need $\pi(\theta, \eta)$. This is given by 
+To find the posterior for $\theta$, we begin with
 
-- sett inn utregning for dette
+\begin{align}\label{post_theta}
+    \pi(\theta|\mathbf{y}) \propto \frac{\pi(\mathbf{y}|\eta,\theta)\pi(\eta|\theta)\pi(\theta)}{\pi(\eta|\theta, \mathbf{y})}.
+\end{align}
+
+We see from equation \ref{post_theta} that we need $\pi(\boldsymbol{y}| \eta, \theta)$. We have that 
+
+\begin{align}
+    \pi(\mathbf{y}| \eta, \theta) = \pi(\mathbf{y}|\eta),  
+\end{align}
+
+
+which is multivariate normal distributed. 
+
+We also need to find $\pi(\theta, \eta)$. This is given by 
+
+\begin{align}
+  \pi(\theta, \eta) = \pi(\eta|\theta)\pi(\theta)
+  = 
+\end{align}
+
+
+
 
 We note this is a gamma distribution with rate parameter $\alpha = 1$ and scale parameter $\beta = \frac{1}{1 + \frac{1}{2} \eta^{T} Q \eta}$
 
@@ -210,27 +230,17 @@ In Figure \ref{fig:eta_all} we can see all $\pi(\eta_{10}|\theta, \boldsymbol{y}
     \label{fig:post_eta_inla}
 \end{figure}
 
-This giver us the density seen in Figure \ref{fig:post_eta_inla} together with the posterior computed by the Gibbs sampler earlier. As we can see these do not completely overlap. 
+This gives us the density seen in Figure \ref{fig:post_eta_inla} together with the posterior computed by the Gibbs sampler earlier. As we can see these do not completely overlap. The one using INLA is slightly slimmer. We did not have the time to further research why this error occurred.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using the inla() - function in R to implement the model,and comparing the results}
 
+Finally we use the inla function from the R package R inla to implement the same model. 
 
-\begin{figure}[h]
-    \centering
-    \includegraphics{Images/R_inla_theta.pdf}
-    \caption{Plot of the estimates $\theta$ using the inla()-function in the R-inla library}
-    \label{fig:r_inla_theta}
-\end{figure}
+\lstinputlisting[language=R, firstline=269, lastline=280]{Code/INLA.R}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics{Images/R_inla_eta.pdf}
-    \caption{Plot of the estimates of the smoothing parameter $\eta$ using the inla()-function on the R-inla library.}
-    \label{fig:r_inla_eta}
-\end{figure}
-
+We compare this with our previous distributions.
 \begin{figure}[h]
     \centering
     \includegraphics{Images/theta_comparison.pdf}
@@ -238,9 +248,17 @@ This giver us the density seen in Figure \ref{fig:post_eta_inla} together with t
     \label{fig:theta_comparison}
 \end{figure}
 
+From Figure \ref{fig:theta_comparison} we see that the distribution overlaps perfectly. We note here that we scaled the manualy computed INLA posterior by $0.9*10^7$ and consider this the normalizing constant. We should probably have computed this more propparly but since we had limited amount of time we chose not to focus on this. 
+
 \begin{figure}[h]
     \centering
     \includegraphics{Images/smoothing_comparison.pdf}
     \caption{Plot of estimated smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla().}
     \label{fig:smoothing_comparison}
 \end{figure}
+
+In Figure \ref{fig:smoothing_comparison} we see all three posterior distributions for $\eta_{10}$ and see that they do not overlap as expected. We see that the posterior computed by R.INLA looks slimilar to the one from the gibs sampling but shifted slightly to the left. 
+
+In fact when we shift this distribution to the right by $0.65$ they overlap perfectly. 
+
+We therefor make a plot to compare the distribution for all $\eta_i$ from both hte Gibbs sampler and the R-inla posteriors. This is shown in figure ..... We see that it looks like the Gibbs sampler is consequently lower than R inla. We note however that the lenght of the credible intervals look very similar and the shift is consistent over all $eta_i$. Hence we think the error might ly in the mean of the computation of $eta_i$ in the Gibbs sampler.  
