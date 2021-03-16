@@ -140,10 +140,10 @@ summary(posterior_dist_MC_usefull)
 q <- ggplot(posterior_dist_MC_usefull, aes(x = V1))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q <-
-  q + geom_vline(xintercept = 1.797) + geom_text(x = 2.2, y = 0.5, label =
+  q + geom_vline(xintercept = 1.797) + geom_text(x = 2.2, y = 0.45, label =
                                                    "Mean")
 q <-
-  q + geom_vline(xintercept = 1.6136) + geom_text(x = 1.8, y = 0.6, label =
+  q + geom_vline(xintercept = 1.6136) + geom_text(x = 0.8, y = 0.5, label =
                                                     "Mode")
 q <- q + xlab(unname(TeX(c("$\\theta$"))))
 q <- q + ylab("Density")
@@ -303,6 +303,7 @@ q <-
   q + ylab("Density") + ggtitle(unname(TeX(c(
     "Posterior density for $\\eta_{10}$"
   ))))
+q <- q + theme(legend.title = element_blank())
 q
 
 ggsave(
@@ -344,6 +345,7 @@ q <-
   q + geom_line(data = as.data.table(precision), aes(x = x, y = y , colour = "INLA"))
 q <-
   q + xlim(0, 6) + xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
+q <- q + theme(legend.title = element_blank())
 q
 
 
@@ -370,6 +372,7 @@ q <-
                  ))
 q <-
   q + xlim(0, 6) + xlab(unname(TeX(c("$\\theta$")))) + ylab("Density")
+q <- q + theme(legend.title = element_blank())
 q
 
 ggsave(
@@ -389,6 +392,7 @@ q <-
                    colour = "INLA"
                  )) +
   xlab("x") + ylab("eta")
+q <- q + theme(legend.title = element_blank())
 q
 
 
@@ -413,6 +417,7 @@ q <-
 q <-
   q + geom_line(data = as.data.table(eta_10_inla), aes(x = x, y = y , colour = "INLA")) +
   xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
+q <- q + theme(legend.title = element_blank())
 q
 
 ggsave(
@@ -437,6 +442,7 @@ q <-
 q <-
   q + geom_line(data = as.data.table(eta_10_inla), aes(x = x + 0.65, y = y , colour = "INLA")) +
   xlab(unname(TeX(c("$\\eta_{10}$")))) + ylab("Density")
+q <- q + theme(legend.title = element_blank())
 q
 
 ggsave(
@@ -471,6 +477,7 @@ q <- q + xlab(unname(TeX(c("$\\eta$"))))
 q <- q + ylab("value")
 q <-
   q + ggtitle("Mean and 95 % credible interval for the smoothing parameter")
+q <- q + theme(legend.title = element_blank())
 q
 
 ggsave(

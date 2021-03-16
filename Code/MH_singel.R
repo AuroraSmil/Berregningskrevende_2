@@ -101,16 +101,32 @@ setnames(sim_MH_single, c("t", "lambda_0", "lambda_1", "beta", "a"))
 sim_MH_single[, iteration := seq(1:n)]
 
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
-q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
+q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0")) 
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_0$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\lambda_0$"))))
 q
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_1$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\lambda_1$"))))
 q
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = beta, colour = "beta"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\beta$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\beta$"))))
 q
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab("t")
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
 q
 
 ggsave(
