@@ -90,15 +90,15 @@ We note that the full conditional for $\theta$ is a gamma distributed with shape
 $I$ is the identity matrix and $y$ are the values of the dataset for each time as seen in Figure \ref{fig:gaussian_data}. 
 
 
-\lstinputlisting[language=R, firstline=56, lastline=67]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=57, lastline=78]{Code/INLA.R}
 
 Now we are ready to implement the Gibbs sampling for $f(\eta, \theta | \boldsymbol{y})$. Firstly, we propose a new value for $\theta$ using the full conditional $\pi(\theta|\eta, \boldsymbol{y})$ then we propose a new value for $\eta$ using the full conditional $\pi(\eta|\theta, \boldsymbol{y})$. 
 
-\lstinputlisting[language=R, firstline=69, lastline=86]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=81, lastline=97]{Code/INLA.R}
 
 We run with initial values for $\theta = 0$ and $\eta$ a random sample from the ful lconditional of $\eta$ given the initial condition for $\theta$.
 
-\lstinputlisting[language=R, firstline=88, lastline=100]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=99, lastline=111]{Code/INLA.R}
 
 Since this is an MCMC algorithm we need to evaluate the burn in period. 
 
@@ -145,7 +145,6 @@ We can also look at the mean and $95 \%$ credible intervals. This can be seen in
 
 We now want to use the INLA scheme to find the posterior for $\pi\theta| \boldsymbol{y})$ and $\pi(\eta_i| \boldsymbol{y})$ for all $i$.
 
-- Sett inn likningn fra opgaven
 
 To find the posterior for $\theta$, we begin with
 
@@ -165,24 +164,22 @@ which is multivariate normal distributed.
 We also need to find $\pi(\theta, \eta)$. This is given by 
 
 \begin{align}
-  \pi(\theta, \eta) = \pi(\eta|\theta)\pi(\theta)
-  = 
+  \pi(\theta, \eta) = \pi(\eta|\theta)\pi(\theta), 
 \end{align}
 
+where $\pi(\eta|\theta)$ is normally distributed with mean $\mathbf{0}$ and precision matrix $\mathbf{Q(\theta)}$, and $\pi(\theta)$ is gamma distributed with shape parameter $\alpha = 1$ and scale parameter $\beta = 1$. This means that $\pi(\theta. \eta)$ is a gamma distribution with rate parameter $\alpha = 1$ and scale parameter $\beta = \frac{1}{1 + \frac{1}{2} \eta^{T} Q \eta}$
 
+Lastly we need $\pi(\eta| \theta \boldsymbol{y})$ which we calculated in part \ref{Gibbs} to be a gamma distribution with rate, $\alpha = \frac{T}{2}$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$.
 
+We construct a grid for values of $\theta$, and then choose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
 
-We note this is a gamma distribution with rate parameter $\alpha = 1$ and scale parameter $\beta = \frac{1}{1 + \frac{1}{2} \eta^{T} Q \eta}$
+We construct a grid for values of $\theta$, and choose an $\eta$ at random. This can be done because expression \ref{post_theta} should be true for all values of $\eta$. Then, we compute all the elements mentioned above.  
 
-Lastly we need $\pi(\eta| \theta \boldsymbol{y})$ which we calculated in part \ref{Gibbs} to be a gamma distribution with rate, $\alpha = \frac{T}{2}$ ans scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ 
+\lstinputlisting[language=R, firstline=206, lastline=218]{Code/INLA.R}
 
-We constuct a grid for values of $\theta$ chose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
+\lstinputlisting[language=R, firstline=220, lastline=230]{Code/INLA.R}
 
-\lstinputlisting[language=R, firstline=177, lastline=186]{Code/INLA.R}
-
-\lstinputlisting[language=R, firstline=188, lastline=197]{Code/INLA.R}
-
-We now have the approximation for the porsterior density of $\theta$.
+From these computation, we are left with the approximation for the posterior density of $\theta$, shown in figure \ref{fig:post_theta_inla}. 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_inla.pdf}
@@ -190,13 +187,13 @@ We now have the approximation for the porsterior density of $\theta$.
     \label{fig:post_theta_inla}
 \end{figure}
 
-Figure \ref{fig:post_theta_inla} shows the posterior distribution computed by INLA. We note that this should be multiplied by a normalizing constant. However this will only shift the values of the density not the shape. 
+We note that this should be multiplied by a normalizing constant. This will shift the values of the density, but it will not change the shape of the density. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$}
 
-We now want to preform tha last inla step, implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$ We will do this only for $\eta_{10}$. 
+We now want to perform the last inla step, implementing the approximation of the marginal posterior for the smooth effect, $\pi(\eta_i | y)$. We will do this only for $\eta_{10}$. 
 
 We know 
 
@@ -205,13 +202,13 @@ We know
     \pi(\eta|\boldsymbol{y}) = \int \pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y}) d\theta.
 \end{equation}
 
-In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y})$ for a grid of eta values for all values in the $\theta$-grid from Section \ref{theta_post_inla}. We use the values for $\pi(\theta|\boldsymbol{y})$ computed earlier. Finaly we sum all the weighted densities for $\pi(\eta|\boldsymbol{y}, \theta)$ weighted by $\pi(\theta|\boldsymbol{y})$
+In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y}, \theta) \pi(\theta|\boldsymbol{y})$ for a grid of eta values for all values in the $\theta$-grid from Section \ref{theta_post_inla}. We use the values for $\pi(\theta|\boldsymbol{y})$ computed earlier. Finally we sum all the weighted densities for $\pi(\eta|\boldsymbol{y}, \theta)$ weighted by $\pi(\theta|\boldsymbol{y})$.
 
-\lstinputlisting[language=R, firstline=221, lastline=227]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=257, lastline=263]{Code/INLA.R}
 
-\lstinputlisting[language=R, firstline=232, lastline=240]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=275, lastline=283]{Code/INLA.R}
 
-\lstinputlisting[language=R, firstline=244, lastline=244]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=287, lastline=289]{Code/INLA.R}
 
 \begin{figure}
     \centering
@@ -238,12 +235,12 @@ This gives us the density seen in Figure \ref{fig:post_eta_inla} together with t
 
 Finally we use the inla function from the R package R inla to implement the same model. 
 
-\lstinputlisting[language=R, firstline=269, lastline=280]{Code/INLA.R}
+\lstinputlisting[language=R, firstline=322, lastline=339]{Code/INLA.R}
 
 We compare this with our previous distributions.
 \begin{figure}[h]
     \centering
-    \includegraphics{Images/theta_comparison.pdf}
+    \includegraphics[width=\textwidth]{Images/theta_comparison.pdf}
     \caption{Plot of estimated hyperparameter $\theta$ for MCMC, manually implemented INLA and INLA implemented using R-inla().}
     \label{fig:theta_comparison}
 \end{figure}
@@ -252,13 +249,27 @@ From Figure \ref{fig:theta_comparison} we see that the distribution overlaps per
 
 \begin{figure}[h]
     \centering
-    \includegraphics{Images/smoothing_comparison.pdf}
-    \caption{Plot of estimated smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla().}
+    \includegraphics[width=\textwidth]{Images/smoothing_comparison.pdf}
+    \caption{Plot of smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla().}
     \label{fig:smoothing_comparison}
 \end{figure}
 
 In Figure \ref{fig:smoothing_comparison} we see all three posterior distributions for $\eta_{10}$ and see that they do not overlap as expected. We see that the posterior computed by R.INLA looks slimilar to the one from the gibs sampling but shifted slightly to the left. 
 
-In fact when we shift this distribution to the right by $0.65$ they overlap perfectly. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{Images/smoothing_comparison_shifted.pdf}
+    \caption{Plot of estimated smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla() shifted with $0.65$.}
+    \label{fig:smoothing_shift}
+\end{figure}
+In fact when we shift this distribution to the right by $0.65$ they overlap perfectly as seen in Figure \ref{fig:smoothing_shift}. 
 
-We therefor make a plot to compare the distribution for all $\eta_i$ from both hte Gibbs sampler and the R-inla posteriors. This is shown in figure ..... We see that it looks like the Gibbs sampler is consequently lower than R inla. We note however that the lenght of the credible intervals look very similar and the shift is consistent over all $eta_i$. Hence we think the error might ly in the mean of the computation of $eta_i$ in the Gibbs sampler.  
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{Images/smoothing_comparison_all eta.pdf}
+    \caption{Mean and 95 \% credible intervals for $\eta$ wiht booth Gibbs sampling and INLA}
+    \label{fig:eta_all_comp}
+\end{figure}
+
+We therefor make a plot to compare the distribution for all $\eta_i$ from both hte Gibbs sampler and the R-inla posteriors. This is shown in figure \ref{fig:eta_all_comp}. We see that it looks like the Gibbs sampler is consequently lower than R inla. We note however that the lenght of the credible intervals look very similar and the shift is consistent over all $eta_i$. Hence we think the error might ly in the mean of the computation of $eta_i$ in the Gibbs sampler.  

@@ -19,11 +19,11 @@ We can instantly see that the incline of the graf is different at the begining a
 
 
 \subsection{Posterior distribution of underlying model parameters} \label{posterior}
-\todo[color = yellow]{Litt pirk her men når tenksten er såpass lik oppgaveteksten synes jeg der er ryddig å på en måte referere til oppgaven så det kommer tydelig fram at vi ikke har funnet det på selv. Jeg skrev det også om bittelitt}
+%\todo[color = yellow]{Litt pirk her men når tenksten er såpass lik oppgaveteksten synes jeg der er ryddig å på en måte referere til oppgaven så det kommer tydelig fram at vi ikke har funnet det på selv. Jeg skrev det også om bittelitt}
 
 As proposed in the exercise set we are adopting a hierarchical Bayesian model to analyse the data set. We assume that the coal-mining disasters follow a inhomogeneous Poisson process with intensity function $\lambda(t)$. We assume $\lambda(t)$ to be piecewise constant with $n$ breakpoints. The start and endpoints are denoted by $t_0$ and $t_{n+1}$ for the data set and let $t_k; k = 0,...,n$ denote the break points of the intensity function. In our case we only have one break point. This means,  
-\todo{Trenger jeg ha med all denne forklaringen, eller er det nok å si at n = 1 litt tidligere?} 
-\todo[color = yellow]{Forklaringen er fin men vi kan gjøre herifra og ut med våre parametre :) }
+%\todo{Trenger jeg ha med all denne forklaringen, eller er det nok å si at n = 1 litt tidligere?} 
+%\todo[color = yellow]{Forklaringen er fin men vi kan gjøre herifra og ut med våre parametre :) }
 
 \begin{align}
     \lambda_0 = \textbf{for } t \in [t_0,t_{1}]) \text{ and }\\
@@ -52,8 +52,8 @@ The hyper parameter $\beta$ follows the following improper distribution,
 
 In total this gives us the following model parameters, $\boldsymbol{\theta} = (t_1, \lambda_0, \lambda_1, \beta)$. 
 To find an expression for the posterior distribution of $\boldsymbol{\theta}$ given $x$, $f(\boldsymbol{\theta}|x)$, we use Bayes' theorem, and find that 
-\todo{forklar mer hvordan vi kommer fram til dette?}
-\todo[color = yellow]{la til mellomsteget. Det er ikke egentlig noe mer og forklare her det er sånn Bayes formula er definert :) }
+%\todo{forklar mer hvordan vi kommer fram til dette?}
+%\todo[color = yellow]{la til mellomsteget. Det er ikke egentlig noe mer og forklare her det er sånn Bayes formula er definert :) }
 \begin{align}
     f(\theta|x) = \frac{f(x|\theta) \pi(\theta)}{f(x)} \propto f(x|\theta) \pi(\theta) .
 \end{align}
@@ -122,7 +122,7 @@ and we also recognize this as belonging to a gamma distribution with rate parame
 We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from seen in equation \ref{eq:post}.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
 To find $t_1$, we use the Metropolis-Hastings step with a random walk of order one. This means we propose a new value for $t_1$ which we from now on will call $t$ from the normal distribution with the previous $t$ value as mean and a tuning parameter $\sigma$ as variance. 
 
-\todo[color = yellow]{Her var det noe som ikke ble helt riktig. Det som står nå er rett det som er kommentert ut er ikke helt rett}
+%\todo[color = yellow]{Her var det noe som ikke ble helt riktig. Det som står nå er rett det som er kommentert ut er ikke helt rett}
 % We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q(t_1|x)$ using a random walk step, where $Q(t_1|x)$ is our proposal distribution. We have chosen our random walk step to be normally distributed with mean $t_{old}$ and standard deviation $\sigma$.
 
 We then compute the acceptance probability for $t_{new}$
@@ -148,7 +148,7 @@ All of this gives us the following algorithm,
 
 To evaluate the burn-in period of the algorithm, we have plotted the values of $\lambda_0, \lambda_1, t_1$ and $\beta$ for $n$ iterations of our MCMC algorithm, using tuning parameter $\sigma = 3$ and starting values $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 45$. This is seen in figure \ref{fig:burnin_singleMH}. 
 
-\todo[color = yellow]{Husk å skrive hva vi har brukt som initialverdier og verdien til sigma}
+%\todo[color = yellow]{Husk å skrive hva vi har brukt som initialverdier og verdien til sigma}
 
 \begin{figure}[h]
     \centering
@@ -182,25 +182,25 @@ To evaluate the burn-in period of the algorithm, we have plotted the values of $
 
 We plotted the parameters separately so they are easier to evaluate. We need to choose a burn-in period for the algorithm equal to the longest burn-in period amongst the parameters. 
 In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simulations stabilize very quickly, and there is a very small burn-in period for these parameters. 
-\todo[inline]{burn-in for beta. Den er ikke helt stabil}
+%\todo[inline]{burn-in for beta. Den er ikke helt stabil}
 \todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
 For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for different initial values of $t$, and for different different values for the tuning parameter $\sigma$. In figure \ref{fig:sim_t_diff_start} we see the parameter $t_1$ with $n = 10000$ samples, for three different initial values of $t_1$. 
 
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t_start_35.pdf}
         \caption{$t_{1_{start}} = 35$}
         \label{fig:sim_t_diff_start_35}
     \end{subfigure}
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t.pdf}
         \caption{$t_{1_{start}} = 45$}
         \label{fig:sim_t_diff_start_45}
     \end{subfigure}
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t_start_90.pdf}
         \caption{$t_{1_{start}} = 90$}
@@ -252,11 +252,11 @@ We see in figures \ref{fig:sim_t_diff_start_35} and \ref{fig:sim_t_diff_start_45
 
 %mixing
 \todo[color = yellow]{Dette er forsåvidt rett men ha også med et plott med to forskjellig kjeder og se hvordan de mikser}
-To evaluate the mixing properties of our algorithm, we first plot the autocorrelation function for our parameter $t_1$ after the initial burn-in period, which we have set to be $b = *???$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that the mixing is not slow. 
+To evaluate the mixing properties of our algorithm, we first plot the autocorrelation function for our parameter $t_1$ after the initial burn-in period, which we have set to be $b = 500$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that the mixing is not slow. 
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
-    \includegraphics{Images/acf_t_10000.pdf}
+    \includegraphics[width = \textwidth]{Images/acf_t_10000.pdf}
     \caption{Autocorrelation function of $t_1$ for different $lag$. }
     \label{fig:acf_t}
 \end{figure}
