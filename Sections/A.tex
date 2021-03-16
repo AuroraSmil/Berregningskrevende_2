@@ -55,9 +55,9 @@ To find an expression for the posterior distribution of $\boldsymbol{\theta}$ gi
 %\todo{forklar mer hvordan vi kommer fram til dette?}
 %\todo[color = yellow]{la til mellomsteget. Det er ikke egentlig noe mer og forklare her det er sånn Bayes formula er definert :) }
 \begin{align}
-    f(\theta|x) = \frac{f(x|\theta) \pi(\theta)}{f(x)} \propto f(x|\theta) \pi(\theta) .
+    f(\theta|\boldsymbol{x}) = \frac{f(\boldsymbol{x}|\theta) \pi(\theta)}{f(\boldsymbol{x})} \propto f(\boldsymbol{x}|\theta) \pi(\theta) .
 \end{align}
-The likelihood $f(x | \boldsymbol{\theta})$ is given above, $\pi(\boldsymbol{\theta})$ can be computed knowing $t_1, \lambda_0$ and $\lambda_1$ are all independent. In total this means,
+The likelihood $f(\boldsymbol{x} | \boldsymbol{\theta})$ is given above, $\pi(\boldsymbol{\theta})$ can be computed knowing $t_1, \lambda_0$ and $\lambda_1$ are all independent. In total this means,
 
 \begin{align}
     \pi(\boldsymbol{\theta}) 
@@ -82,7 +82,7 @@ Using this and the given likelihood, we find the posterior distribution for $f(\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Full conditional distribution for the model parameters} \label{full_cond}
 
-To find the full conditional for each of the elements in $\boldsymbol{\theta}$, we use the expression for the posterior distribution given in \eqref{eq:post}. When we are looking at the full conditional for one of the elements in $\theta$ gven all the others, the other parameters can be viewed as constants. This means what we can overlook them in our proportional model, and we get that the full conditional for $t_1$ is
+To find the full conditional for each of the elements in $\boldsymbol{\theta}$, we use the expression for the posterior distribution given in \eqref{eq:post}. When we are looking at the full conditional for one of the elements in $\boldsymbol{\theta}$ given all the others, the other parameters can be viewed as constants. This means what we can overlook them in our proportional model, and we get that the full conditional for $t_1$ is
 
 \begin{align}
     f(t_1 | \lambda_0, \lambda_1, \beta, x) \propto 
@@ -450,22 +450,28 @@ The trace plots for the MCMC-algorithm with block Metropolis-Hastings steps are 
 
 \subsection{The block Metropolitan-Hastings algorithm for different values of the tuning parameter}
 
+
 \begin{comment}
 
 \begin{figure}
     \centering
     \begin{subfigure}
-        \includegraphics{}
+        \includegraphics[width = 0.49\textwidth]{Images/block_sim_t.pdf}
         \caption{Caption}
         \label{fig:my_label}
     \end{subfigure}
     \begin{subfigure}
-        \includegraphics{}
+        \includegraphics[width = 0.49\textwidth]{Images/block_sim_t_sigma10.pdf}
         \caption{Caption}
         \label{fig:my_label}
     \end{subfigure}
     \begin{subfigure}
-        \includegraphics{}
+        \includegraphics[width = 0.49\textwidth]{Images/block_sim_beta.pdf}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{subfigure}
+    \begin{subfigure}
+        \includegraphics[width = 0.49\textwidth]{Images/block_sim_beta_sigma10.pdf}
         \caption{Caption}
         \label{fig:my_label}
     \end{subfigure}
@@ -473,32 +479,10 @@ The trace plots for the MCMC-algorithm with block Metropolis-Hastings steps are 
     \label{fig:sigma_t}
 \end{figure}
 
-\begin{figure}
-    \centering
-    \begin{subfigure}
-        \includegraphics{}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \begin{subfigure}
-        \includegraphics{}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \begin{subfigure}
-        \includegraphics{}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \caption{}
-    \label{fig:sigma_beta}
-\end{figure}
-
 \end{comment}
 
-
 In the block Metropolis-Hastings algorithm, we have two different tuning parameters. One for each of the different block proposals. 
-\todo[inline]{Se på koden, klarer ikke å kjøre med stor $\sigma_t$ (f.eks $\sigma_t$ = ), og heller ikke med veldig liten $\sigma_{beta}$ (f.eks $\sigma_{beta}$ = 0.003).}
+%\todo[inline]{Se på koden, klarer ikke å kjøre med stor $\sigma_t$ (f.eks $\sigma_t$ = ), og heller ikke med veldig liten $\sigma_{beta}$ (f.eks $\sigma_{beta}$ = 0.003).}
 
 
  In figure \ref{}, we have plotted the parameter $t$ and $\beta$ for two different values of $\sigma_t$. We figure \ref{}, we have plotted the simulation of parameters $t$ and $\beta$ for two different values of $\sigma_{\beta}$. The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. However, we see in figures \ref{} and \ref{} that changing the tuning parameter for one of the block does not greatly change the mixing or acceptance rate for the other block. We do however see how the.... 
