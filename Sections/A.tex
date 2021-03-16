@@ -459,9 +459,9 @@ The different block proposals does not run completely independently of each othe
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_t.pdf}
-        \caption{Trace plot for $t$ with $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$}
-        \label{fig:block_sim_t}
+        \includegraphics[width = \textwidth]{Images/block_sim_t_sigma03.pdf}
+        \caption{Trace plot for $t$ with $\sigma_t = 0.3$ and $\sigma_{\beta} = 0.3$}
+        \label{fig:block_sim_t_sigma03}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
@@ -483,6 +483,12 @@ The different block proposals does not run completely independently of each othe
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma3.pdf}
+        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 3$}
+        \label{fig:block_sim_beta_sigma3}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
         \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma10.pdf}
         \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 10$}
         \label{fig:block_sim_beta_sigma10}
@@ -492,7 +498,19 @@ The different block proposals does not run completely independently of each othe
 \end{figure}
 
 
- In figure \ref{fig:block_sim_t} and \ref{fig:block_sim_beta_sigma10}, we have plotted the parameter $t$  for two different values of $\sigma_t$. We clearly see how increasing the tuning parameter from $\sigma_t = 3$ to $\sigma_t = 10$ decreases the acceptance rate of the Metropolis Hastings step in our MCMC algorithm. Far fewer proposed samples are accepted. In figure \ref{fig:block_sim_beta} and \ref{fig:block_sim_beta_sigma10}, we have plotted the trace plot of parameter $\beta$ for two different values of $\sigma_{\beta}$. Here, we see no discernible difference in the acceptance rate of the Metropolis Hastings step for the different values of the tuning parameter, $\sigma_{\beta} = 0.03$ and $\sigma_{\beta} = 10$. We are unsure of why this is.
+ In figure \ref{fig:block_sim_t_sigma03},\ref{fig:block_sim_t} and \ref{fig:block_sim_beta_sigma10}, we have plotted the parameter $t$  for three different values of $\sigma_t$. We clearly see how increasing the tuning parameter from $\sigma_t = 3$ to $\sigma_t = 10$ decreases the acceptance rate of the Metropolis Hastings step in our MCMC algorithm. Far fewer proposed samples are accepted. We also see how the steps taken by $t_1$ in figure \ref{fig:block_sim_t_sigma03} are smaller than the steps taken for $\sigma_t$ larger. We do however see that the mixing is better for this small value of $\sigma_t$ than it was for the single site Metropolis Hastings algorithm, as seen in figure \ref{fig:tuning_single_03}.
+ 
+ In figure \ref{fig:block_sim_beta}, \ref{fig:block_sim_beta_sigma3} and \ref{fig:block_sim_beta_sigma10}, we have plotted the trace plot of parameter $\beta$ for three different values of $\sigma_{\beta}$. Here, we see no discernible difference in the acceptance rate of the Metropolis Hastings step for the different values of the tuning parameter, $\sigma_{\beta} = 0.03, \sigma_{\beta} = 3$ and $\sigma_{\beta} = 10$. We are unsure of why this is.
 
 
-\todo[inline]{Oppgaven sier "compare the burn-in and the mixing properties of the single site and block MH-alg. Lite problem: får ikke til å kjøre med sigma t det samme som i single site. Skal jeg da endre på plottene i single site?}
+\todo[inline]{snakk noe om burn-in-periode.}
+
+\todo[inline]{Fra oppgaven: Use the simulation
+results to estimate the marginal posterior distributions f(t1|x), f(⁄0|x), f(⁄1|x) and f(—|x).
+Use also the simulated values to estimate E[t1|x], E[⁄0|x], E[⁄1|x] and Cov[⁄0,⁄1|x]. Dette må plottes, eller er det noe vi har plottet? }
+
+We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x], \mathbf{E}[\lambda_0|x]$ and $\mathbf{E}[\lambda_0|x]$. We do this by removing the burn-in period, and then finding the empirical means. 
+
+\lstinputlisting[language=R, firstline=254, lastline=262]{Code/MH_block.R}
+
+The values obtained are then $\mathbf{E}[t_1|x] = , \mathbf{E}[\lambda_0|x] = $ and $\mathbf{E}[\lambda_0|x] = $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
