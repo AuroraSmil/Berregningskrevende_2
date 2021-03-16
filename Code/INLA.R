@@ -8,20 +8,20 @@ library(tikzDevice)
 
 # Importing data
 data <- as.data.table(read.delim("code/Gaussiandata.txt", header = FALSE))
-data[, x := seq(1:nrow(data))]
+data[, t := seq(1:nrow(data))]
 setnames(data, "V1", "value")
 head(data)
 
 
 # Plot the data
-q <- ggplot(data, aes(x, value))
+q <- ggplot(data, aes(t, value))
 q <- q + geom_point()
-q <- q + labs(title = "Gaussian data", x = "x",  y = "Value")
+q <- q + labs(title = "Gaussian data", x = "t",  y = "Value")
 q
 
 ggsave(
   "gaussian_data.pdf",
-  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
   width = 17,
   height = 10,
   units = "cm"
@@ -66,21 +66,12 @@ pi_eta_full_cond <- function(Q, I ,  y){
   return (retval)
 }
 
-# Collect Q, I and y
-Q <-as.matrix( make_Q(20))
-I <- diag(nrow = 20, ncol = 20)
-y <- data$value
-
 # Define the gibbs algorithm
-Gibbs_alg <- function(n ,data){
+Gibbs_alg <- function(n ,data, theta_0, eta_0){
   T = 20
   Q <-as.matrix( make_Q(20))
   I <- diag(nrow = 20, ncol = 20)
   y <- data$value
-  
-  #Define initial values for theta and eta
-  theta <-  0
-  eta <-  pi_eta_full_cond(Q*(theta), I, y)
   
   results <- matrix(nrow = n, ncol = 21)
   results[1, 1:21] <- c(theta, eta)
@@ -96,11 +87,34 @@ Gibbs_alg <- function(n ,data){
 
 #Run algorithm
 n = 100000
-posterior_dist_MC <- Gibbs_alg(n, data)
-summary(posterior_dist_MC)
+
+#Define initial values for theta and eta
+theta <-  0
+## Collect Q, I and y
+Q <-as.matrix( make_Q(20))
+I <- diag(nrow = 20, ncol = 20)
+y <- data$value
+eta <-  pi_eta_full_cond(Q*(theta), I, y)
+
+posterior_dist_MC <- Gibbs_alg(n, data, eta_0 = eta, theta_0 = theta)
+
+q <- ggplot(data = as.data.table(posterior_dist_MC[1:25000,]), aes(x = 1:25000) )
+q <- q + geom_line(aes(y = V1))
+q <- q + ylab(unname(TeX(c("$\\theta$")))) +
+  ggtitle(unname(TeX("Traceplot for MCMC samples of theta $\\theta$"))) +
+  xlab("Itteration")
+q
+
+ggsave(
+  "trace_theta_mcmc.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
 
 # Discard burn in period
-posterior_dist_MC_usefull <- posterior_dist_MC[5000:nrow(posterior_dist_MC), ]
+posterior_dist_MC_usefull <- posterior_dist_MC[10000:nrow(posterior_dist_MC), ]
 posterior_dist_MC_usefull <- as.data.table(posterior_dist_MC_usefull)
 posterior_dist_MC_usefull[, itteration:= 1:nrow(posterior_dist_MC_usefull)]
 
