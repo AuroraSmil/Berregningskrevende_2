@@ -87,7 +87,7 @@ beta = 3
 
 
 # Set n, t_0, t_2 and tuning parameter sigma
-n = 10000
+n = 1000
 t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963? 
 sigma = 3
@@ -95,7 +95,7 @@ sigma = 3
 # Run algorithm
 sim_MH_single <- MH_single_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma)
 
-#Format and plot the reuslts
+#Format and plot the results
 sim_MH_single <- as.data.table(sim_MH_single)
 setnames(sim_MH_single, c("t", "lambda_0", "lambda_1", "beta", "a"))
 sim_MH_single[, iteration := seq(1:n)]
@@ -120,6 +120,27 @@ ggsave(
   height = 10,
   units = "cm"
 )
+
+
+#mixing of the MH-algorithm
+t_alt = data[1, date] + 80
+sim_MH_single_alt <- MH_single_alg(n,data, t_0, t_2, t_alt, lambda_0,lambda_1, beta, sigma)
+
+
+
+sim_MH_single_alt <- as.data.table(sim_MH_single_alt)
+setnames(sim_MH_single_alt, c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
+sim_MH_single_alt[, iteration := seq(1:n)]
+
+test <- rbind(list(sim_MH_single$t, sim_MH_single_alt$t_alt, sim_MH_single$iteration))
+
+q <- ggplot(data = as.data.table(test), aes(x = iteration) )
+q <- q + geom_line(aes(y = t, colour = "t"))
+q <- q + geom_line(aes(y = t_alt, colour = "t_alt"))
+q
+
+
+
 
 # Check if values seem reasonable
 summary(sim_MH_single)
