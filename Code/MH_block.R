@@ -153,14 +153,14 @@ MH_alg <- function(n,data, t_0,t_2, t, lambda_0,lambda_1, beta, sigma_t, sigma_b
 
 t =45
 
-lambda_0 <- 135/50
-lambda_1 <-  56/50
+lambda_0 <- 10
+lambda_1 <-  5
 beta = 3
 
 n = 10000
 t_0 = 0
 t_2 = 112 #maybe should be 1963? 
-sigma_t = 0.1
+sigma_t = 3
 sigma_beta = 0.3
 
 sim_MH <- MH_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma_t = sigma_t, sigma_beta = sigma_beta)
@@ -172,20 +172,74 @@ setnames(sim_MH, c("t", "lambda_0", "lambda_1", "beta", "a"))
 sim_MH[, itteration := seq(1:n)]
 sim_MH
 
-par(mfrow = c(2,2))
 
-q1 <- ggplot(data = sim_MH, aes(x = itteration) )
-q1 <- q1 + geom_line(aes(y = lambda_0, colour = "lambda_0"))
-q1
-q2 <- ggplot(data = sim_MH, aes(x = itteration) )
-q2 <- q2 + geom_line(aes(y = lambda_1, colour = "lambda_1"))
-q2
-q3 <- ggplot(data = sim_MH, aes(x = itteration) )
-q3 <- q3 + geom_line(aes(y = beta, colour = "beta"))
-q3
-q4 <- ggplot(data = sim_MH, aes(x = itteration) )
-q4 <- q4 + geom_line(aes(y = t, colour = "t"))
-q4
+
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = lambda_0, colour = "lambda_0"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_0$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\lambda_0$"))))
+q
+
+ggsave(
+  "block_sim_lambda0.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = lambda_1, colour = "lambda_1"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_1$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\lambda_1$"))))
+q
+
+ggsave(
+  "block_sim_lambda1.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = beta, colour = "beta"))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\beta$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for $\\beta$"))))
+q
+
+ggsave(
+  "block_sim_beta.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <- ggplot(data = sim_MH, aes(x = itteration) )
+q <- q + geom_line(aes(y = t, colour = "t"))
+q <- q + ylab("t")
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
+q
+
+ggsave(
+  "block_sim_t.pdf",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+
 
 #grid.arrange(q1,q2,q3,q4, ncol = 2)
 
