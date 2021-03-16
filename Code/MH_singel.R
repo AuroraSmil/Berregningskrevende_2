@@ -80,6 +80,7 @@ library(boot)
 library(data.table)
 library(tidyr)
 library(ggplot2)
+library(latex2exp)
 
 # Create data table
 data <- as.data.table(coal)
@@ -114,6 +115,8 @@ t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963? 
 sigma = 3
 
+t_2
+
 # Run algorithm
 sim_MH_single <- MH_single_alg(n,data, t_0, t_2, t, lambda_0,lambda_1, beta, sigma)
 
@@ -132,7 +135,11 @@ q
 
 ggsave(
   "sim_lambda0.pdf",
+<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+=======
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+>>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
@@ -148,7 +155,11 @@ q
 
 ggsave(
   "sim_lambda1.pdf",
+<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+=======
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+>>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
@@ -164,11 +175,19 @@ q
 
 ggsave(
   "sim_beta.pdf",
+<<<<<<< HEAD
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+=======
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
+>>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
   width = 17,
   height = 10,
   units = "cm"
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> f59f2de7abbf5f76d1e12d14c265b18b6518d5ee
 q <- ggplot(data = sim_MH_single, aes(x = iteration) )
 q <- q + geom_line(aes(y = t, colour = "t"))
 q <- q +  theme(legend.position = "none")
@@ -271,7 +290,7 @@ ggsave(
 
 # Check if values seem reasonable
 summary(sim_MH_single)
-3.655*(1891- t_0) + 0.62*(t_2-1891)
+3.395*(1891- 1851.632) + 0.797*(1960.489-1891)
 
 q <- ggplot(data = data, aes(x = date, y = cum_event))
 q <- q + geom_line()
@@ -279,8 +298,14 @@ q
 
 ##Looking at the acf of t
 
-burnin <- 1000
+burnin <- 500
+
+
 
 sim_t <- sim_MH_single$t[burnin:n]
 
 acf(sim_t)
+
+no_burnin_sim_MH <- sim_MH_single[burnin:n]
+
+summary(no_burnin_sim_MH)
