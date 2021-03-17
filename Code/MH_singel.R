@@ -199,11 +199,11 @@ q <- q + geom_line(aes(y = t, colour = "t"))
 q <- q +  theme(legend.position = "none")
 q <- q + ylab("t")
 q <- q + xlab("Iteration")
-q <- q + ggtitle(unname(TeX(c("Traceplot for t with initital value t = 1860"))))
+q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
 q
 
 ggsave(
-  "sim_t_1_2.pdf",
+  "sim_t.pdf",
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
   width = 17,
   height = 10,
@@ -212,8 +212,6 @@ ggsave(
 
 
 #mixing of the MH-algorithm
-# t_alt_1 = data[1, date] + 70
-# t_alt_2 = data[1, date] + 30
 
 n = 10000
 sigma = 10
@@ -357,12 +355,147 @@ q
 
 burnin <- 500
 
-
-
-sim_t <- sim_MH_single$t[burnin:n]
+sim_t <- sim_MH_single_1$t[burnin:n]
 
 acf(sim_t)
 
 no_burnin_sim_MH <- sim_MH_single[burnin:n]
 
 summary(no_burnin_sim_MH)
+
+
+
+
+## TUNING #######
+
+n = 100000
+sigma_1 = 10
+sigma_2 = 1.5
+sigma_3  = 20
+sim_MH_single_1 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_3, lambda_0, lambda_1, beta, sigma_1)
+sim_MH_single_2 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_3, lambda_0, lambda_1, beta, sigma_2)
+sim_MH_single_3 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_3, lambda_0, lambda_1, beta, sigma_3)
+
+sim_MH_single_1 <- as.data.table(sim_MH_single_1)
+sim_MH_single_2 <- as.data.table(sim_MH_single_2)
+sim_MH_single_3 <- as.data.table(sim_MH_single_3)
+setnames(sim_MH_single_1,
+         c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
+setnames(sim_MH_single_2,
+         c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
+setnames(sim_MH_single_3,
+         c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
+sim_MH_single_1[, iteration := seq(1:n)]
+sim_MH_single_2[, iteration := seq(1:n)]
+sim_MH_single_3[, iteration := seq(1:n)]
+
+sim_MH_single_1[, run := 1]
+sim_MH_single_2[, run := 2]
+sim_MH_single_3[, run := 3]
+sim_MH_single_compare <-
+  rbindlist(list(sim_MH_single_1, sim_MH_single_2, sim_MH_single_3))
+
+#[iteration <2600 & iteration >2400 ]
+q <-
+  ggplot(
+    data = as.data.table(sim_MH_single_compare),
+    aes(
+      x = iteration,
+      group = as.factor(run),
+      colour = as.factor(run)
+    )
+  )
+q <- q + geom_line(aes(y = t_alt))
+#q <- q +  theme(legend.position = "none")
+q <- q + ylab("t")
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
+q
+
+ggsave(
+  "tuning_t.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <-
+  ggplot(
+    data = as.data.table(sim_MH_single_compare),
+    aes(
+      x = iteration,
+      group = as.factor(run),
+      colour = as.factor(run)
+    )
+  )
+q <- q + geom_line(aes(y = lambda_0))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_0$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c(
+  "Traceplot for $\\lambda_0$"
+))))
+q
+
+ggsave(
+  "tuning_lambda_0.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <-
+  ggplot(
+    data = as.data.table(sim_MH_single_compare),
+    aes(
+      x = iteration,
+      group = as.factor(run),
+      colour = as.factor(run)
+    )
+  )
+q <- q + geom_line(aes(y = lambda_0))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\lambda_0$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c(
+  "Traceplot for $\\lambda_1$"
+))))
+q
+
+ggsave(
+  "mixing_lambda_1.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+q <-
+  ggplot(
+    data = as.data.table(sim_MH_single_compare),
+    aes(
+      x = iteration,
+      group = as.factor(run),
+      colour = as.factor(run)
+    )
+  )
+q <- q + geom_line(aes(y = beta))
+q <- q +  theme(legend.position = "none")
+q <- q + ylab(unname(TeX(c("$\\beta$"))))
+q <- q + xlab("Iteration")
+q <- q + ggtitle(unname(TeX(c(
+  "Traceplot for $\\beta$"
+))))
+q
+
+ggsave(
+  "tuning_beta.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
