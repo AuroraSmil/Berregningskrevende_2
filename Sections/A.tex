@@ -104,12 +104,11 @@ The full conditional for $\lambda_0$ and $\lambda_1$ can also be found by using 
     \lambda_1^{y_1 + 1}\cdot \text{exp} \Big( -\frac{1}{\beta} \lambda_1 - (t_2 - t_1)\lambda_1 \Big) \nonumber \\
     \propto  \lambda_1^{y_1 + 1} \cdot \text{exp} \Big( - \lambda_1 (\frac{1}{\beta} + t_2 - t_1) \Big),
 \end{align}
-and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed with rate, $\alpha$, and scale, $\beta$, parameters respectivly $\alpha_0 = y_0 + 2$, $\beta_0 = \frac{1}{\frac{1}{\beta} + t_1 - t_0}$, $\alpha_1 = y_1 + 2$, $\beta_1 = \frac{1}{\frac{1}{\beta} + t_2 - t_1}$. 
+and we see that the full conditional for $\lambda_0$ and the full conditional for $\lambda_1$ are both gamma distributed with rate $\alpha$ and scale $\beta$ parameters respectively $\alpha_0 = y_0 + 2$, $\beta_0 = \frac{1}{\frac{1}{\beta} + t_1 - t_0}$, $\alpha_1 = y_1 + 2$, $\beta_1 = \frac{1}{\frac{1}{\beta} + t_2 - t_1}$. 
 
 
 
 For the last parameter $\beta$, the full conditional is given by,
-
 \begin{align}
     f(\beta | \lambda_0, \lambda_1, t_1, x) \propto 
     \frac{1}{\beta^5} \cdot \text{exp} \Big( -\frac{1}{\beta}(\lambda_0 + \lambda_1 + 1) \Big),
@@ -119,30 +118,24 @@ and we also recognize this as belonging to a gamma distribution with rate parame
 
 \subsection{Single site MCMC algorithm}
 
-We have defined and implemented a single site MCMC algorithm for $f(\theta |x)$. $f(\theta|x)$ is the target distribution we want to sample from seen in equation \ref{eq:post}.  As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
+We have defined and implemented a single site MCMC algorithm to sample from $f(\theta |x)$ given in \ref{eq:post}. As the full conditionals of $\beta^i, \lambda_0^i$ and $\lambda_1^i$ belong to known distributions, we can use Gibbs sampling to draw directly from the full conditionals for these parameters. For $t_1$ however, this is not possible.
 To find $t_1$, we use the Metropolis-Hastings step with a random walk of order one. This means we propose a new value for $t_1$ which we from now on will call $t$ from the normal distribution with the previous $t$ value as mean and a tuning parameter $\sigma$ as variance. 
 
 %\todo[color = yellow]{Her var det noe som ikke ble helt riktig. Det som står nå er rett det som er kommentert ut er ikke helt rett}
 % We draw an initial state for $t$ and then propose a new state $t_{new}$ from $Q(t_1|x)$ using a random walk step, where $Q(t_1|x)$ is our proposal distribution. We have chosen our random walk step to be normally distributed with mean $t_{old}$ and standard deviation $\sigma$.
 
 We then compute the acceptance probability for $t_{new}$
-
 \begin{align}
     \alpha(t_{new}|x) = \text{min} \Big( 1, \frac{f(t_{new}| \lambda_0, \lambda_1, \beta, x)}{f(t_{old}| \lambda_0, \lambda_1, \beta, x)} \Big) \nonumber \\ 
-    = \text{min} \Big( \frac{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{new})}{\lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{old})} \Big) \nonumber \\
-    = \text{min} \Big( 1, \frac{\text{exp}(-(\lambda_0 - \lambda_1)t_{new})}{\text{exp}(-(\lambda_0 - \lambda_1)t_{old})} \Big)
+    = \text{min} \Big( \frac{\lambda_0^{y_{0_{new}} + 1} \cdot \lambda_1^{y_{1_{new}} + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{new})}{\lambda_0^{y_{0_{old}} + 1} \cdot \lambda_1^{y_{1_{old}} + 1} \text{exp}(-(\lambda_0 - \lambda_1)t_{old})} \Big) \nonumber 
 \end{align}
 
-and accept or reject the proposed $t$. We note that since the proposal density is a random walk the proposal ration which usually is a part of the acceptance probability cancels out. 
+and accept or reject the proposed $t$. We note that since the proposal density is a random walk the proposal ratio which usually is a part of the acceptance probability cancels out. Also we compute this on a log scale to avoid computational issues.
 
 All of this gives us the following algorithm, 
 
 %input code lines here. 
-\lstinputlisting[language=R, firstline=3, lastline=57]{Code/MH_singel.R}
-
-\todo{Bør jeg gå mer i detalj om acceptance/rejection her?}
-
-
+\lstinputlisting[language=R, firstline=11, lastline=87]{Code/MH_singel.R}
 
 \subsection{Burn-in and mixing period of the algorithm}
 
@@ -186,6 +179,7 @@ In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simul
 \todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
 For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for different initial values of $t$, and for different different values for the tuning parameter $\sigma$. In figure \ref{fig:sim_t_diff_start} we see the parameter $t_1$ with $n = 10000$ samples, for three different initial values of $t_1$. 
 
+\todo[]{Disse må kjøres på nytt, eller vent, vi trenger jo ikke disse nå som vi har mixing plottene!!!! :) :) }
 \begin{figure}[h]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
@@ -294,22 +288,22 @@ We have implemented our Markov Chain Monte Carlo algorithm with a tuning paramet
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t_sigma_03.pdf}
-        \caption{}
+        \caption{$\sigma = 0.3$}
         \label{fig:tuning_single_03}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t.pdf}
-        \caption{}
+        \caption{$\sigma = 3$}
         \label{fig:tuning_single_3}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/sim_t_sigma_15.pdf}
-        \caption{}
+        \caption{$\sigma = 15$}
         \label{fig:tuning_single_15}
     \end{subfigure}
-    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000 samples$. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1896$}
+    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1896$}
     \label{fig:tuning_t_single}
 \end{figure}
 
@@ -451,39 +445,72 @@ The trace plots for the MCMC-algorithm with block Metropolis-Hastings steps are 
 \subsection{The block Metropolitan-Hastings algorithm for different values of the tuning parameter}
 
 
-\begin{comment}
 
-\begin{figure}
-    \centering
-    \begin{subfigure}
-        \includegraphics[width = 0.49\textwidth]{Images/block_sim_t.pdf}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \begin{subfigure}
-        \includegraphics[width = 0.49\textwidth]{Images/block_sim_t_sigma10.pdf}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \begin{subfigure}
-        \includegraphics[width = 0.49\textwidth]{Images/block_sim_beta.pdf}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \begin{subfigure}
-        \includegraphics[width = 0.49\textwidth]{Images/block_sim_beta_sigma10.pdf}
-        \caption{Caption}
-        \label{fig:my_label}
-    \end{subfigure}
-    \caption{}
-    \label{fig:sigma_t}
-\end{figure}
-
-\end{comment}
 
 In the block Metropolis-Hastings algorithm, we have two different tuning parameters. One for each of the different block proposals. 
 %\todo[inline]{Se på koden, klarer ikke å kjøre med stor $\sigma_t$ (f.eks $\sigma_t$ = ), og heller ikke med veldig liten $\sigma_{beta}$ (f.eks $\sigma_{beta}$ = 0.003).}
 
 
- In figure \ref{}, we have plotted the parameter $t$ and $\beta$ for two different values of $\sigma_t$. We figure \ref{}, we have plotted the simulation of parameters $t$ and $\beta$ for two different values of $\sigma_{\beta}$. The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. However, we see in figures \ref{} and \ref{} that changing the tuning parameter for one of the block does not greatly change the mixing or acceptance rate for the other block. We do however see how the.... 
- \todo[inline]{Sett inn plott og kommenter de.}
+
+The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. However, as only one of the tuning parameters are used at a time, one in each block, the tuning parameter for each block will not significantly change the trace plot for the parameter updated in the other block. Because of this, we have chosen to change the tuning parameters separately, and then see how this change changes mixing and the acceptance rates for proposals of the parameter in that block. 
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_t_sigma03.pdf}
+        \caption{Trace plot for $t$ with $\sigma_t = 0.3$ and $\sigma_{\beta} = 0.3$}
+        \label{fig:block_sim_t_sigma03}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_t.pdf}
+        \caption{Trace plot for $t$ with $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$}
+        \label{fig:block_sim_t}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_t_sigma10.pdf}
+        \caption{Trace plot for $t$ with $\sigma_t = 10$ and $\sigma_{\beta} = 0.3$}
+        \label{fig:block_sim_t_sigma10}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_beta.pdf}
+        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$}
+        \label{fig:block_sim_beta}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma3.pdf}
+        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 3$}
+        \label{fig:block_sim_beta_sigma3}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma10.pdf}
+        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 10$}
+        \label{fig:block_sim_beta_sigma10}
+    \end{subfigure}
+    \caption{Traceplots for $t_1$ and $\beta$ with different tuning parameters $\sigma_t$ and $\sigma_{beta}$. All initial values were held constant, with values $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1896$.}
+    \label{fig:block_tuning}
+\end{figure}
+
+
+ In figure \ref{fig:block_sim_t_sigma03},\ref{fig:block_sim_t} and \ref{fig:block_sim_beta_sigma10}, we have plotted the parameter $t$  for three different values of $\sigma_t$. We clearly see how increasing the tuning parameter from $\sigma_t = 3$ to $\sigma_t = 10$ decreases the acceptance rate of the Metropolis Hastings step in our MCMC algorithm. Far fewer proposed samples are accepted. We also see how the steps taken by $t_1$ in figure \ref{fig:block_sim_t_sigma03} are smaller than the steps taken for $\sigma_t$ larger. We do however see that the mixing is better for this small value of $\sigma_t$ than it was for the single site Metropolis Hastings algorithm, as seen in figure \ref{fig:tuning_single_03}.
+ 
+ In figure \ref{fig:block_sim_beta}, \ref{fig:block_sim_beta_sigma3} and \ref{fig:block_sim_beta_sigma10}, we have plotted the trace plot of parameter $\beta$ for three different values of $\sigma_{\beta}$. Here, we see no discernible difference in the acceptance rate of the Metropolis Hastings step for the different values of the tuning parameter, $\sigma_{\beta} = 0.03, \sigma_{\beta} = 3$ and $\sigma_{\beta} = 10$. We are unsure of why this is.
+
+
+\todo[inline]{snakk noe om burn-in-periode.}
+
+\todo[inline]{Fra oppgaven: Use the simulation
+results to estimate the marginal posterior distributions f(t1|x), f(⁄0|x), f(⁄1|x) and f(—|x).
+Use also the simulated values to estimate E[t1|x], E[⁄0|x], E[⁄1|x] and Cov[⁄0,⁄1|x]. Dette må plottes, eller er det noe vi har plottet? }
+
+We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x], \mathbf{E}[\lambda_0|x]$ and $\mathbf{E}[\lambda_0|x]$. We do this by removing the burn-in period, and then finding the empirical means. 
+
+\lstinputlisting[language=R, firstline=254, lastline=262]{Code/MH_block.R}
+
+The values obtained are then $\mathbf{E}[t_1|x] = , \mathbf{E}[\lambda_0|x] = $ and $\mathbf{E}[\lambda_0|x] = $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
