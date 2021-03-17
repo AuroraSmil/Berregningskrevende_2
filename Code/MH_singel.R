@@ -93,7 +93,7 @@ library(tidyr)
 library(ggplot2)
 library(latex2exp)
 
-# Create data table
+# Create data table ----
 data <- as.data.table(coal)
 data[, event := 1]
 data[, cum_event := cumsum(event) - 1]
@@ -115,7 +115,7 @@ ggsave(
   units = "cm"
 )
 
-# Initial values for t, lambda_0, lambda_1, beta
+# Initial values for t, lambda_0, lambda_1, beta ----
 t_1_1 = data[1, date] + 50
 t_1_2 = data[1, date] + 10
 t_1_3 = data[1, date] + 80
@@ -125,7 +125,7 @@ beta = 3
 
 
 # Set n, t_0, t_2 and tuning parameter sigma
-n = 10000
+n = 100000
 t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963?
 sigma = 10
@@ -135,7 +135,7 @@ sigma = 10
 sim_MH_single <-
   MH_single_alg(n, data, t_0, t_2, t_1_1, lambda_0, lambda_1, beta, sigma)
 
-#Format and plot the results
+#Format and plot the results -----
 sim_MH_single <- as.data.table(sim_MH_single)
 setnames(sim_MH_single, c("t", "lambda_0", "lambda_1", "beta", "a"))
 sim_MH_single[, iteration := seq(1:n)]
@@ -211,7 +211,7 @@ ggsave(
 )
 
 
-#mixing of the MH-algorithm
+#mixing of the MH-algorithm ------
 
 n = 10000
 sigma = 10
@@ -499,3 +499,73 @@ ggsave(
   height = 10,
   units = "cm"
 )
+
+
+
+##################### Density plots ##################################################
+sim_MH_single
+mean<- summary(sim_MH_single)[4,]
+cov <- cov(sim_MH_single[2000:nrow(sim_MH_single),lambda_1], sim_MH_single[2000:nrow(sim_MH_single),lambda_0])
+
+sum[4,]
+
+q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = t))
+q <- q + geom_histogram(aes(y = ..density..), bins = 150)
+q <- q + xlab(unname(TeX(c("$t$"))))
+q <- q + ylab("Density")
+q <- q + ggtitle(unname(TeX("Posterior density of $t$")))
+q
+
+
+ggsave(
+  "post_t_single.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = beta))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- q + xlab(unname(TeX(c("$\\beta$"))))
+q <- q + ylab("Density")
+q <- q + ggtitle(unname(TeX("Posterior density of $\\beta$")))
+q
+
+ggsave(
+  "post_beta_single.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = lambda_0))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- q + xlab(unname(TeX(c("$\\lambda_0$"))))
+q <- q + ylab("Density")
+q <- q + ggtitle(unname(TeX("Posterior density of $\\lambda_0$")))
+q
+ggsave(
+  "post_lambda_0_single.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
+q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = lambda_0))
+q <- q + geom_histogram(aes(y = ..density..), bins = 100)
+q <- q + xlab(unname(TeX(c("$\\lambda_1$"))))
+q <- q + ylab("Density")
+q <- q + ggtitle(unname(TeX("Posterior density of $\\lambda_1$")))
+q
+
+ggsave(
+  "post_lambda_1_single.pdf",
+  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  width = 17,
+  height = 10,
+  units = "cm"
+)
+
