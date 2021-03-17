@@ -270,40 +270,21 @@ which indicates that the estimates for $\lambda_0, \lambda_1$ and $t_1$ are reas
 
 \subsection{The tuning parameter and how it influences the burn-in and mixing of the simulated Markov Chain}
 
-We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  Here we see that with $\sigma = 0.3$, the steps taken are very small. This leads to a slow exploration of the target density, and we see that $n = 10000$ iterations are far too few for the algorithm to converge. This again leads to a very large burn-in period. For $\sigma = 3$, we see that the there is enough mixing for the samples to quickly converge, and the burn-in period thus become small. If we use a very large tuning parameter, for instance $\sigma = 15$ as in figure \ref{fig:tuning_single_15}, the should be little correlation between $t_{new}$ and $t_{old}$. This means that large moves are proposed, but more proposed values are rejected than with a smaller tuning parameter. 
-
-
-\begin{figure}
-    \centering
-    \includegraphics{}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_sigma_03.pdf}
-        \caption{$\sigma = 0.3$}
-        \label{fig:tuning_single_03}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t.pdf}
-        \caption{$\sigma = 3$}
-        \label{fig:tuning_single_3}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/sim_t_sigma_15.pdf}
-        \caption{$\sigma = 15$}
-        \label{fig:tuning_single_15}
-    \end{subfigure}
-    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1896$}
+    \includegraphics[width = \textwidth]{Images/tuning_stuck_t.pdf}
+    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$}
     \label{fig:tuning_t_single}
 \end{figure}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = \textwidth]{Images/tuning.pdf}
+    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$}
+    \label{fig:tuning_t_single}
+\end{figure}
 
+We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  In Figure \ref{fig:tuning_t_single} we used $sigma_1 = 10$, $sigma_2 = 1$ and $sigma_3 = 20$. Here we see that with the smalest $\sigma$ the algorithm gets stuck in a local maximum. The hole density is not explored within this amount of iterations. This again leads to a very large burn-in period. For the larger values of $\sigma$ the convergence seems to happen very fast. 
 
 
 \subsection{Implementing a block Metropolis-Hastings algorithm}
