@@ -221,28 +221,24 @@ For the parameter $\beta$, we see that the samples fluctuate, but the mean and v
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_0.pdf}
         \caption{$\lambda_0$ }
-        \label{fig:sim_mixing_lam0}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_1.pdf}
         \caption{$\lambda_1$}
-        \label{fig:sim_mixing_lam1}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_beta.pdf}
         \caption{$\beta$ }
-        \label{fig:sim_mixing_beta}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_t.pdf}
         \caption{$t_1$}
-        \label{fig:sim_mixing_t}
     \end{subfigure}
     \caption{Plot of three runs of the MCMC algorithm using $n = 10000$ simulations, using three different starting values for $t_1$.They are $t_1 = 1881$, $t_1 = 1901$ and $t = 1931$ The tuning parameter is set to $\sigma = 3$. The starting values for the other parameters are $\lambda_0 = 10, \lambda_1 = 5$ and $\beta = 3$}
-    \label{fig:sim_mixing}
+    \label{fig:sim_mixing_single}
 \end{figure}
 
 % We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} 
@@ -253,7 +249,7 @@ For the parameter $\beta$, we see that the samples fluctuate, but the mean and v
 %mixing
 %\todo[color = yellow]{Dette er forsåvidt rett men ha også med et plott med to forskjellig kjeder og se hvordan de mikser}
 
-To evaluate the burning period further we look at the mixing properties mixing properties of our algorithm, we plot three simulations of our MCMC algorithm, using three different starting values for our parameter $t_1$. As this was where we saw was the most critical for the burn in period. This should ideally be done for many different combinations ot all parameters but since we only have a limited amount of time for this project we chose to focus on $t$. The plot of the mixing for all parameters can be seen in figure \ref{fig:sim_mixing}. We see in figure \ref{fig:sim_mixing_t} that the plots with different starting values of $t_1$ converges quite quickly, and can therefore assume that the mixing is fast. 
+To evaluate the burning period further we look at the mixing properties mixing properties of our algorithm, we plot three simulations of our MCMC algorithm, using three different starting values for our parameter $t_1$. As this was where we saw was the most critical for the burn in period. This should ideally be done for many different combinations ot all parameters but since we only have a limited amount of time for this project we chose to focus on $t$. The plot of the mixing for all parameters can be seen in figure .... We see in figure ... that the plots with different starting values of $t_1$ converges quite quickly, and can therefore assume that the mixing is fast. 
 
 To further investigate the mixing properties of $t_1$, we plotted the autocorrelation function for $t_1$ after the initial burn-in period, which we have set to be $b = 500$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that correlation between the samples decrease fast enough for the algorithm to explore the density properly. 
 
@@ -287,16 +283,15 @@ which indicates that the estimates for $\lambda_0, \lambda_1$ and $t_1$ are reas
     \label{fig:tuning_t_single}
 \end{figure}
 
-\begin{figure}[h]
+We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  In Figure \ref{fig:tuning_t_single} we used $sigma_1 = 10$, $sigma_2 = 1$ and $sigma_3 = 20$. Here we see that with the smallest $\sigma$ the algorithm gets stuck in a local maximum. The hole density is not explored within this amount of iterations. This again leads to a very large burn-in period. For the larger values of $\sigma$ the convergence seems to happen very fast. 
+In Figure \ref{fig:tuning_t_single_2} we can see that for a slightly higher low value for $\sigma$ it is stuck in the same way to begin with but converges eventually.
+
+\begin{figure}[H]
     \centering
     \includegraphics[width = \textwidth]{Images/tuning_t_nice.pdf}
     \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$. $\sigma = 2$,  $\sigma= 10$,  $\sigma= 20$}
     \label{fig:tuning_t_single_2}
 \end{figure}
-
-We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  In Figure \ref{fig:tuning_t_single} we used $sigma_1 = 10$, $sigma_2 = 1$ and $sigma_3 = 20$. Here we see that with the smallest $\sigma$ the algorithm gets stuck in a local maximum. The hole density is not explored within this amount of iterations. This again leads to a very large burn-in period. For the larger values of $\sigma$ the convergence seems to happen very fast. 
-In Figure \ref{fig:tuning_t_single_2} we can see that for a slightly higher low value for $\sigma$ it is stuck in the same way to begin with but converges eventually.
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -304,7 +299,7 @@ In Figure \ref{fig:tuning_t_single_2} we can see that for a slightly higher low 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Implementing a block Metropolis-Hastings algorithm}
 
-To improve the performance of our Metropolis-Hastings algorithm, we try to perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will implement a block Metropolis-Hastings algorithm with two blocks.
+To improve the performance of our Metropolis-Hastings algorithm, we try to perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will implement a block Metropolis-Hastings algorithm with two blocks. This should have been done one a log scale to avoid computational errors. This however we did not get to work while we did get it to work not using the log scale. 
 
 %A block Metropolis-Hastings algorithm for $f(\theta|x)$ can be defined as 
 %skriv noe om Gibbs sampling?
@@ -313,9 +308,6 @@ We alternate between blocking together $t_1, \lambda_0$ and  $ \lambda_1$ and ke
 
 
 \subsubsection{Using a block proposal for $(t_1, \lambda_0, \lambda_1)$ keeping $\beta$ unchanged}
-
-%\todo[inline]{Introduser og skriv litt om target distribution her}
-% Target distribution.Introduser og skriv litt rundt denne.  
 
 For the first block proposal, our target distribution is
 
@@ -345,6 +337,9 @@ For the acceptance probability, we have that
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection{Using a block proposal for $\beta, \lambda_0, \lambda_1$ keeping $t_1$ unchanged}
 
@@ -392,204 +387,183 @@ First we code all target and proposal distributions needed.
 Then we code the actual algorithm
 \lstinputlisting[language=R, firstline=113, lastline=270]{Code/MH_block.R}
 
-\todo[inline]{Sette inn og kommentere figurer her. }
-
 The trace plots for the MCMC-algorithm with block Metropolis-Hastings steps are shown in figure \ref{fig:burnin_blockMH}. 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/block_sim_lambda0.pdf}
         \caption{$\lambda_0$}
-        \label{fig:block_burnin_lam0}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/block_sim_lambda1.pdf}
         \caption{$\lambda_1$}
-        \label{fig:block_burnin_lam1}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/block_sim_t_sigma10.pdf}
         \caption{$t_1$}
-        \label{fig:block_burnin_t}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma1.pdf}
         \caption{$\beta$}
-        \label{fig:block_burnin_beta}
     \end{subfigure}
     \caption{Trace plots for $n = 10000$ simulations of the different parameters with the block MCMC algorithm. The initial values used are the same as for single site MCMC, namely $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1901$, and the tuning parameters used are $\sigma_t = 10$ and $\sigma_{\beta} = 1$}
     \label{fig:burnin_blockMH}
 \end{figure}
 
 We can see from figure \ref{fig:burnin_blockMH} that all of the parameters seem to converge quite rapidly. 
-Nevertheless we try and run it for different starting values for both t and $\beta$.
-
+Nevertheless we try and run it for different starting values for both $t$ and $\beta$.
 
 \subsection{The block Metropolitan-Hastings algorithm for different starting values}
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_t_block.pdf}
-        \caption{$\lambda_0$}
-        \label{fig:block_burnin_lam0}
+        \caption{$t$}
+
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_beta_block.pdf}
-        \caption{$\lambda_1$}
-        \label{fig:block_burnin_lam1}
+        \caption{$\beta$}
+
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_0_block.pdf}
-        \caption{$t_1$}
-        \label{fig:block_burnin_t}
+        \caption{$\lambda_0$}
+
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_1_block.pdf}
-        \caption{$\beta$}
-        \label{fig:block_burnin_beta}
+        \caption{$\lambda_1$}
+
     \end{subfigure}
-    \caption{Trace plots for $n = 10000$ simulations of the different parameters with the block MCMC algorithm. The initial values used are the same as for single site MCMC, namely $\lambda_0 = 10, \lambda_1 = 5$. For t and $\beta$ we use (1901, 3), (1861, 10) and (1931, 0.1) }
-    \label{fig:burnin_blockMH}
+    \caption{Trace plots for $n = 10000$ simulations of the different parameters with the block MCMC algorithm. The initial values used are $\lambda_0 = 10, \lambda_1 = 5$. For $t$ and $\beta$ we use (1901, 3), (1861, 10) and (1931, 0.1) }
+    \label{fig:mixing_blockMH}
 \end{figure}
+
+
+We can se from Figure \ref{fig:mixing_blockMH} that the chanes mix well and it is almost imposible to distinguishe them from one another. This suggests good mixing properties. 
+
 
 \subsection{The block Metropolitan-Hastings algorithm for different values of the tuning parameter}
 
-
-
-
 In the block Metropolis-Hastings algorithm, we have two different tuning parameters. One for each of the different block proposals. 
-%\todo[inline]{Se på koden, klarer ikke å kjøre med stor $\sigma_t$ (f.eks $\sigma_t$ = ), og heller ikke med veldig liten $\sigma_{beta}$ (f.eks $\sigma_{beta}$ = 0.003).}
 
+The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. Optimaly we would tune this using a grid. But since this is quite time consuming we first look at 3 different values for $\sigma_t$ before looking at three different values for $\sigma_{\beta}$.
+% However, as only one of the tuning parameters are used at a time, one in each block, the tuning parameter for each block will not significantly change the trace plot for the parameter updated in the other block. Because of this, we have chosen to change the tuning parameters separately, and then see how this change changes mixing and the acceptance rates for proposals of the parameter in that block. 
 
-
-The different block proposals does not run completely independently of each other, as the values proposed in one block is used in the other block if accepted. However, as only one of the tuning parameters are used at a time, one in each block, the tuning parameter for each block will not significantly change the trace plot for the parameter updated in the other block. Because of this, we have chosen to change the tuning parameters separately, and then see how this change changes mixing and the acceptance rates for proposals of the parameter in that block. 
 
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_t_sigma03.pdf}
-        \caption{Trace plot for $t$ with $\sigma_t = 0.3$ and $\sigma_{\beta} = 0.3$}
-        \label{fig:block_sim_t_sigma03}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_t.pdf}
-        \caption{Trace plot for $t$ with $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$}
-        \label{fig:block_sim_t}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_t_sigma10.pdf}
-        \caption{Trace plot for $t$ with $\sigma_t = 10$ and $\sigma_{\beta} = 0.3$}
-        \label{fig:block_sim_t_sigma10}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_beta.pdf}
-        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 0.3$}
-        \label{fig:block_sim_beta}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma3.pdf}
-        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 3$}
-        \label{fig:block_sim_beta_sigma3}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/block_sim_beta_sigma10.pdf}
-        \caption{Trace plot for $\beta$ with $\sigma_t = 3$ and $\sigma_{\beta} = 10$}
-        \label{fig:block_sim_beta_sigma10}
-    \end{subfigure}
-    \caption{Traceplots for $t_1$ and $\beta$ with different tuning parameters $\sigma_t$ and $\sigma_{beta}$. All initial values were held constant, with values $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1896$.}
-    \label{fig:block_tuning}
-\end{figure}
+        \includegraphics[width = \textwidth]{Images/tuning_beta_block.pdf}
+        \caption{$\beta$}
 
-
- In figure \ref{fig:block_sim_t_sigma03},\ref{fig:block_sim_t} and \ref{fig:block_sim_beta_sigma10}, we have plotted the parameter $t$  for three different values of $\sigma_t$. We clearly see how increasing the tuning parameter from $\sigma_t = 3$ to $\sigma_t = 10$ decreases the acceptance rate of the Metropolis Hastings step in our MCMC algorithm. Far fewer proposed samples are accepted. We also see how the steps taken by $t_1$ in figure \ref{fig:block_sim_t_sigma03} are smaller than the steps taken for $\sigma_t$ larger. We do however see that the mixing is better for this small value of $\sigma_t$ than it was for the single site Metropolis Hastings algorithm, as seen in figure \ref{fig:tuning_single_03}.
- 
- In figure \ref{fig:block_sim_beta}, \ref{fig:block_sim_beta_sigma3} and \ref{fig:block_sim_beta_sigma10}, we have plotted the trace plot of parameter $\beta$ for three different values of $\sigma_{\beta}$. Here, we see no discernible difference in the acceptance rate of the Metropolis Hastings step for the different values of the tuning parameter, $\sigma_{\beta} = 0.03, \sigma_{\beta} = 3$ and $\sigma_{\beta} = 10$. We are unsure of why this is.
-
-
-\todo[inline]{snakk noe om burn-in-periode.}
-
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[width = \textwidth]{Images/mixing_lambda_0_block.pdf}
-        \caption{$\lambda_0$ }
-        \label{fig:sim_mixing_lam0}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/mixing_lambda_1_block.pdf}
+        \includegraphics[width = \textwidth]{Images/tuning_lambda_0_block.pdf}
+        \caption{$\lambda_0$}
+
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/tuning_lambda_1_block.pdf}
         \caption{$\lambda_1$}
-        \label{fig:sim_mixing_lam1}
+
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/mixing_beta_block.pdf}
-        \caption{$\beta$ }
-        \label{fig:sim_mixing_beta}
+        \includegraphics[width = \textwidth]{Images/tuning_t_block.pdf}
+        \caption{$t$}
+
+    \end{subfigure}
+    \caption{Trace plots for $n = 10000$ simulations of the different values for $\sigma_t$ with the block MCMC algorithm. The initial values used are $\lambda_0 = 10, \lambda_1 = 5$ and $beta = 1$. For $t$ we use (3, 10, 30) }
+    \label{fig:tuning_t_blockMH}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/tuning_beta_block_beta.pdf}
+        \caption{$\beta$}
+
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width = \textwidth]{Images/mixing_t_block.pdf}
-        \caption{$t_1$}
-        \label{fig:sim_mixing_t}
+        \includegraphics[width = \textwidth]{Images/tuning_lambda_0_block_beta.pdf}
+        \caption{$\lambda_0$}
+
     \end{subfigure}
-    \caption{Plot of three runs of the MCMC algorithm using $n = 10000$ simulations, using three different starting values for $t_1$.They are $t_1 = 1881$, $t_1 = 1901$ and $t = 1931$ and 3 differen starting values for beta 0.1, 3, 10. The tuning parameter is set to $\sigma_t = 10$ and $\sigma_{beta} = 1$. The starting values for the other parameters are $\lambda_0 = 10, \lambda_1 = 5$.}
-    \label{fig:sim_mixing}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/tuning_lambda_1_block_beta.pdf}
+        \caption{$\lambda_1$}
+
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/tuning_t_block_beta.pdf}
+        \caption{$t$}
+
+    \end{subfigure}
+     \caption{Trace plots for $n = 10000$ simulations with different values for tuning parameter $\sigma_{\beta}$ with the block MCMC algorithm. The initial values used are $\lambda_0 = 10, \lambda_1 = 5$, $t = 1931$. We test $\beta = (0.3, 1, 10)$ }
+    \label{fig:tuning_beta_blockMH}
 \end{figure}
 
 
-
-
-
-
-
-\todo[inline]{Fra oppgaven: Use the simulation
-results to estimate the marginal posterior distributions f(t1|x), f(⁄0|x), f(⁄1|x) and f(—|x). Cov[lambda0,lanbda1|x]. Dette må plottes, eller er det noe vi har plottet? Og hva er kovariansen, har vi ikke antatt disse uanvhengig?}
+ In Figure \ref{fig:tuning_t_blockMH} we have plotted the parameter $t$  for three different values of $\sigma_t$. It is not very clear from the figure but increasing the tuning parameter leads to a lower acceptance rate. We also sence how the steps taken by $t_1$ are smaller than the steps taken for $\sigma_t$ larger. It looks a bit like the chain does not mix so well for the lowest value of the tuning parameter. 
+ 
+ In figure \ref{fig:tuning_beta_blockMH} we have plotted the trace plot of parameter $\beta$ for three different values of $\sigma_{\beta}$. Here the mixing of the chians is very good and the only difference we not is how many steps are accepted. 
 
 We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x], \mathbf{E}[\lambda_0|x]$ and $\mathbf{E}[\lambda_1|x]$. We do this by removing the burn-in period, and then finding the empirical means. 
 
-\lstinputlisting[language=R, firstline=254, lastline=262]{Code/MH_block.R}
 
-The values obtained are then $\mathbf{E}[t_1|x] = 1891, \mathbf{E}[\lambda_0|x] = 3.381 $ and $\mathbf{E}[\lambda_1|x] = 0.798 $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
-
-
-\todo[color = yellow]{Sett in posterior plotsene de ligger inder images. Prøv å lag fire plott med posterio til t for single og block ved siden av hverandre etc.. }
 \begin{table}[]
+\centering
 \begin{tabular}{lcccc}
                            & \textbf{t} & \textbf{$\lambda_0$} & \textbf{$\lambda_1$} & \textbf{$\beta$} \\ \hline
 \textbf{Mean single site}  & 1891       & 3.084              & 0.9256             & 1.003         \\
 \textbf{Mean block update} & 1891       & 3.014              & 0.9945             & 1.17         
 \end{tabular}
+\caption{Posterior means of $t$, $\lambda_0$, $\lambda_1$, and $\beta$}
 \label{tab:mean}
 \end{table}
 
-We see from Tabel \ref{tab:mean} that the means are quite similar. For $\beta$ it differs slightly. 
+We see from Table \ref{tab:mean} that the means using single site and block updating are quite similar. For $\beta$ it differs slightly. This could be due to computational errors. 
 
 \begin{table}[]
+\centering
 \begin{tabular}{lc}
                       & \textbf{Cov($\lambda_1$, $\lambda_0$)} \\ \hline
 \textbf{Single site}  & 0.00199                            \\
 \textbf{Block update} & 0.01475                           
 \end{tabular}
+\caption{...}
 \label{tab:cov}
 \end{table}
 
-From Table \ref{tab:cov} we see that the covariance is lower in the single site update than in the block update. This could be because in the block update eather both are updated together with t or all rejected. This could mean that only "good" combinations of $\lambda_0$ and $\lambda_1$ are accepted. 
+From Table \ref{tab:cov} we see that the covariance is lower in the single site update than in the block update. This could be because in the block update either both are updated together with t or all rejected. This could mean that only "good" combinations of $\lambda_0$ and $\lambda_1$ are accepted. 
+
+
+\todo[color = yellow]{Sett in posterior plotsene de ligger inder images. Prøv å lag fire plott med posterio til t for single og block ved siden av hverandre etc.. }
+
+
+We see that the posterior densities look quite similar when using the single site versus the block updating. 
+
+
+
+
+

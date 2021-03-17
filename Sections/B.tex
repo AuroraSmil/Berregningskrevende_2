@@ -15,9 +15,9 @@ In Figure \ref{fig:gaussian_data} vi can see the Gaussian data we want to find t
 
 \subsection{Latent Gaussian model}
 
-As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_{20})$ the observations $y_k$ are independent and Gaussian distributed, having mean $\eta_t$. The known unit variance is $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,20$, and there is a smooth effect of time which the linear predictor is linked to, $\eta_t = f_t$. 
+As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_{20})$ the observations $y_k$ are independent and normally distributed, having mean $\eta_t$ and variance $1$,  $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,20$. $\eta_t$ is a smooth effect of time which the linear predictor is linked to, $\eta_t = f_t$. 
 
-We are choosing a second order Random Walk model as the prior distribution for the vector \textbf{f} $= (f_1,...,f_{20})$ model the temporal effects of the covariates. As $\eta_t = f_t$, we have that 
+We are implementing a second order Random Walk model as the prior distribution for the vector \textbf{f} $= (f_1,...,f_{20})$ to model the temporal effects of the covariates. As $\eta_t = f_t$, we have that 
 
 \begin{align} \label{RW_prior}
     \pi(\mathbf{f}|\theta) = \pi(\mathbf{\eta}|\theta) \propto
@@ -28,9 +28,9 @@ We are choosing a second order Random Walk model as the prior distribution for t
 To find the precision matrix for our model, we expand the expression for $\textbf{Q}(\theta)$ from equation \ref{RW_prior}. We then have that 
 
 \begin{align} \label{precision_mat}
-    \textbf{Q}(\theta) = \sum_{t = 3}^{20} (f_t - 2f_{t-1} + f_{t-2})^2 \nonumber \\
-    = \sum_{t = 3}^{20} (f_t^2 + 4f_{t-1}^2 + f_{t-2}^2 - 4f_t f_{t-1} - 4 f_{t-1} f_{t-2} + 2f_t f_{t-2}) \nonumber \\
-    = ... = 
+    \textbf{Q}(\theta) =\frac{\theta}{2} \sum_{t = 3}^{20} (f_t - 2f_{t-1} + f_{t-2})^2 \nonumber \\
+    = \frac{\theta}{2}\sum_{t = 3}^{20} (f_t^2 + 4f_{t-1}^2 + f_{t-2}^2 - 4f_t f_{t-1} - 4 f_{t-1} f_{t-2} + 2f_t f_{t-2}) \nonumber \\
+    = ... = \frac{\theta}{2}
     \begin{bmatrix}
         1 & -2 & 1 & . & . & . & . & . \\
         -2 & 5 & -4 & 1 & . & . & . & .  \\
@@ -43,50 +43,35 @@ To find the precision matrix for our model, we expand the expression for $\textb
     \end{bmatrix}.
 \end{align}
 
-This is a sparse matrix. As the precision matrix is sparse, and we assume the latent model to be Gaussian, this is a Gaussian Markov Random Field (GMRF). 
+This is a sparse matrix. 
 
+In total we have a model where all latent variables are Gaussian. We also have that they are all conditionally independent resulting in a sparse precision matrix implieing the latent field is a Gaussian Markov Random Field (GMRF). 
 
-\todo[color = yellow]{Hvis du fokuserer på å få inn alle plottene og skrive innn likningene så kan jeg vet skrive forståelsestingene på tirsdag. I hvert fall er g6t5fr5det fint om du tar det i den rekkefølgen :D  }
+The set of hyper parameters consists only of $\theta$ which has the gamma(1,1) prior. This means the set of hyper parameters are small and we fulfill all requirements to use INLA.
 
-
-
-A structured additive model can be defined as 
-
-%Dette er structured additiv model
-\begin{equation} 
-\begin{split}
-    g(\mu_i) = \eta_i = \alpha + \sum_{k = 1}^{n_\beta} \beta_k z_{mi} + \sum_{j = 1}^{n_f}f^{(j)}(u_{ji}) + \epsilon_i.
-\end{split}
-\end{equation}
-
-As our model is a latent Gaussian model, and these are a subclass of the structured additive regression model, then $y$ belongs to the exponential family. In addition, all latent variables have Gaussian priors. In addition to this, the latent field has to be conditionally independent, and our model is conditionally independent given the $\eta$-vector. As all this is fulfilled in our model, along with the requirement that there are few hyperparameters, we can use INLA to estimate the model parameters. 
-
-
-
+The resulting joint distribution of $y$, $\eta$ and $\theta$ is  $ \pi(y, \eta, \theta )= \pi(y|\eta) \cdot \pi(\eta|\theta) \cdot \pi(\theta)$ where $\pi(y|\eta)$, $\pi(\eta|\theta)$ and $\pi(\theta)$ are as given above.
 
 \subsection{Gibbs sampling algorithm for $f(\eta, \theta |y)$}
 \label{Gibbs}
 
 First we implement a Gibbs sampling algorithm for $f(\eta, \theta |y)$. To do so we need the full conditional of both $\pi(\theta|\eta, y)$ and $\pi(\eta|\theta, y)$. They are:
 
-- skriv inn the full conditional for $\pi(\theta|\eta, y)$ og $\pi(\eta|\theta, y)$
-
 \begin{align}
-    \pi(\theta| \eta, y) = \pi(y|\eta) \cdot \pi(\eta|\theta) \cdot \pi(\theta) \propto \pi(\eta|\theta) \cdot \pi(\theta) \nonumber \\
+    \pi(\theta| \eta, y) \propto \pi(\eta|\theta) \cdot \pi(\theta) \nonumber \\
     = \theta^{\frac{(T-2)}{2}} \cdot \text{exp} \Big\{ \eta^T Q \frac{\theta}{2} \eta \Big\} \cdot \text{exp}(\theta) \nonumber \\
     = \text{exp} \Big\{  \theta \big(1 + \frac{\eta^T Q \eta}{2}  \big) \theta^{\frac{(T-2)}{2}}  \Big\}, 
 \end{align}
 
 and 
 \begin{align}
-    \pi(\eta | \theta, y) \propto f(\mathbf{f}|\mathbf{\eta}) \cdot f(\mathbf{\eta}|\theta) \nonumber \\
-    \propto \text{exp} \Bigg\{ -\frac{1}{2}(\mathbf{y} - \mathbf{\eta})^T I (\mathbf{y}-\mathbf{\eta}) - \frac{1}{2} \mathbf{\eta}^T Q \mathbf{\eta} \Bigg\} \nonumber \\
-    = \text{exp} \Bigg\{  -\frac{1}{2} \Big[ (\eta - a)^T (I - Q) (\eta - a) \Big] \Bigg\}, 
+    \pi(\eta | \theta, y) \propto f(\boldsymbol{y}|\mathbf{\eta}) \cdot f(\mathbf{\eta}|\theta) \nonumber \\
+    \propto \text{exp} \Bigg\{ -\frac{1}{2}(\mathbf{y} - \mathbf{\eta})^T I (\mathbf{y}-\mathbf{\eta}) - \frac{1}{2} \mathbf{\eta}^T Q \theta \mathbf{\eta} \Bigg\} \nonumber \\
+    = \text{exp} \Bigg\{  -\frac{1}{2} \Big[ (\eta - a)^T (I - Q\theta) (\eta - a) \Big] \Bigg\}, 
 \end{align}
 
 with $a = y(I + Q \theta)^{-1}$ and $\sum = (I + Q \theta)^{-1}$. 
 
-We note that the full conditional for $\theta$ is a gamma distributed with shape parameter $\alpha = T/2$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ and the full conditional for $\eta$ is multivariate normal distributed with mean $\boldsymbol{\mu} = \boldsymbol{y}(I + Q \theta)^{-1}$ and variance covariance matrix given by $\Sigma = (I + Q \theta)^{-1}$. $Q$ is the precision matrix defined in  \ref{precision_mat}....
+We note that the full conditional for $\theta$ is a gamma distributed with shape parameter $\alpha = T/2$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$ and the full conditional for $\eta$ is multivariate normal distributed with mean $\boldsymbol{\mu} = \boldsymbol{y}(I + Q \theta)^{-1}$ and variance covariance matrix given by $\Sigma = (I + Q \theta)^{-1}$. $Q$ is the precision matrix defined in  \ref{precision_mat}
 $I$ is the identity matrix and $y$ are the values of the dataset for each time as seen in Figure \ref{fig:gaussian_data}. 
 
 
@@ -96,26 +81,26 @@ Now we are ready to implement the Gibbs sampling for $f(\eta, \theta | \boldsymb
 
 \lstinputlisting[language=R, firstline=81, lastline=97]{Code/INLA.R}
 
-We run with initial values for $\theta = 0$ and $\eta$ a random sample from the ful lconditional of $\eta$ given the initial condition for $\theta$.
+We run with initial values, $\theta = 0$ and $\eta$ a random sample from the ful lconditional of $\eta$ given the initial condition for $\theta$.
 
 \lstinputlisting[language=R, firstline=99, lastline=111]{Code/INLA.R}
 
 Since this is an MCMC algorithm we need to evaluate the burn in period. 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width = \textwidth]{Images/trace_theta_mcmc.pdf}
     \caption{Traceplot for $\theta$ using Gibbs sampling}
     \label{fig:trace_theta}
 \end{figure}
 
-We can see from Figure \ref{fig:trace_theta} that the algorithm seems to converge very fast. It has one spike around $iteration= 7000$ so we decide to discard the first $10 000$ samples. When we explore the trace plot for all $\eta_i$ non of them has a longer burn in period and all seem to converge very fast. This is also as expected since the Gibbs sample draws from the actual full conditional. 
+We can see from Figure \ref{fig:trace_theta} that the algorithm seems to converge very fast. It has one spike around $iteration= 7000$ so we decide to discard the first $10 000$ samples. When we explore the trace plot for all $\eta_i$ non of them has a longer burn in period and all seem to converge very fast. This is also as expected since the Gibbs sample draws from their actual full conditional. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$}
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_mcmc.pdf}
     \caption{Plot of the estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$.}
@@ -164,23 +149,21 @@ which is multivariate normal distributed.
 We also need to find $\pi(\theta, \eta)$. This is given by 
 
 \begin{align}
-  \pi(\theta, \eta) = \pi(\eta|\theta)\pi(\theta), 
+  \pi(\theta, \eta) = \frac{T-2}{2} \exp\bigg[-\theta - 0.5 \theta \eta^T Q \eta\bigg], 
 \end{align}
-
-where $\pi(\eta|\theta)$ is normally distributed with mean $\mathbf{0}$ and precision matrix $\mathbf{Q(\theta)}$, and $\pi(\theta)$ is gamma distributed with shape parameter $\alpha = 1$ and scale parameter $\beta = 1$. This means that $\pi(\theta. \eta)$ is a gamma distribution with rate parameter $\alpha = 1$ and scale parameter $\beta = \frac{1}{1 + \frac{1}{2} \eta^{T} Q \eta}$
 
 Lastly we need $\pi(\eta| \theta \boldsymbol{y})$ which we calculated in part \ref{Gibbs} to be a gamma distribution with rate, $\alpha = \frac{T}{2}$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$.
 
 We construct a grid for values of $\theta$, and then choose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
 
-We construct a grid for values of $\theta$, and choose an $\eta$ at random. This can be done because expression \ref{post_theta} should be true for all values of $\eta$. Then, we compute all the elements mentioned above.  
+We construct a grid for values of $\theta$, and choose an $\eta$ at random. This can be done because expression \eqref{post_theta} should be true for all values of $\eta$. Then, we compute all the elements mentioned above.  
 
 \lstinputlisting[language=R, firstline=206, lastline=218]{Code/INLA.R}
 
 \lstinputlisting[language=R, firstline=220, lastline=230]{Code/INLA.R}
 
 From these computation, we are left with the approximation for the posterior density of $\theta$, shown in figure \ref{fig:post_theta_inla}. 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/post_theta_inla.pdf}
     \caption{Plot of the estimate for the posterior marginal for the hyperparameter $\pi(\theta|y)$ using the INLA scheme.}
@@ -210,7 +193,7 @@ In order to approximate \eqref{eq:eta_post} we compute $\pi(\eta|\boldsymbol{y},
 
 \lstinputlisting[language=R, firstline=287, lastline=289]{Code/INLA.R}
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/eta_10.pdf}
     \caption{All distributions of $\eta_{10}$ given $\theta$ from the grid as given in Section \ref{theta_post_inla}}
@@ -247,16 +230,16 @@ We compare this with our previous distributions.
 
 From Figure \ref{fig:theta_comparison} we see that the distribution overlaps perfectly. We note here that we scaled the manualy computed INLA posterior by $0.9*10^7$ and consider this the normalizing constant. We should probably have computed this more propparly but since we had limited amount of time we chose not to focus on this. 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/smoothing_comparison.pdf}
     \caption{Plot of smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla().}
     \label{fig:smoothing_comparison}
 \end{figure}
 
-In Figure \ref{fig:smoothing_comparison} we see all three posterior distributions for $\eta_{10}$ and see that they do not overlap as expected. We see that the posterior computed by R.INLA looks slimilar to the one from the gibs sampling but shifted slightly to the left. 
+In Figure \ref{fig:smoothing_comparison} we see all three posterior distributions for $\eta_{10}$ and see that they do not overlap as expected. We see that the posterior computed by R.INLA looks slimilar to the one from the Gibbs sampling but shifted slightly to the left. 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/smoothing_comparison_shifted.pdf}
     \caption{Plot of estimated smoothing parameter $\eta$ for MCMC, manually implemented INLA and INLA implemented using R-inla() shifted with $0.65$.}
@@ -265,11 +248,11 @@ In Figure \ref{fig:smoothing_comparison} we see all three posterior distribution
 In fact when we shift this distribution to the right by $0.65$ they overlap perfectly as seen in Figure \ref{fig:smoothing_shift}. 
 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/smoothing_comparison_all eta.pdf}
     \caption{Mean and 95 \% credible intervals for $\eta$ wiht booth Gibbs sampling and INLA}
     \label{fig:eta_all_comp}
 \end{figure}
 
-We therefor make a plot to compare the distribution for all $\eta_i$ from both hte Gibbs sampler and the R-inla posteriors. This is shown in figure \ref{fig:eta_all_comp}. We see that it looks like the Gibbs sampler is consequently lower than R inla. We note however that the lenght of the credible intervals look very similar and the shift is consistent over all $eta_i$. Hence we think the error might ly in the mean of the computation of $eta_i$ in the Gibbs sampler.  
+We therefor make a plot to compare the distribution for all $\eta_i$ from both hte Gibbs sampler and the R-inla posteriors. This is shown in figure \ref{fig:eta_all_comp}. We see that it looks like the Gibbs sampler is consequently lower than R inla. We note however that the lenght of the credible intervals look very similar and the shift is consistent over all $eta_i$. Hence we think the error might lie in the mean of the computation of $\eta_i$ in the Gibbs sampler.  
