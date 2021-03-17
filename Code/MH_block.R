@@ -16,6 +16,7 @@ data[, event := 1]
 data[, cum_event := cumsum(event) - 1]
 data[, date_shifted := date - data[1, date]]
 
+#### Target and proposal distributions ####
 f_target_1 <-
   function(lambda_0,
            lambda_1,
@@ -109,6 +110,7 @@ f_prop_2 <-
     return (retval)
   }
 
+#### Block MCMC algorithm ####
 MH_alg <-
   function(n,
            data,
@@ -120,13 +122,14 @@ MH_alg <-
            beta,
            sigma_t,
            sigma_beta) {
+    # substract one to correct for the start and end date
     y_0 = sum(data[date < t]$event) - 1
     y_1 = sum(data[date >= t]$event) - 1
     
     results <- matrix(nrow = n, ncol = 5)
     results[1, 1:5] <- c(t, lambda_0, lambda_1, beta, 1)
     for (i in 2:(n)) {
-      #print(i)
+      # Block with beta constant
       if (i %% 2 == 0) {
         beta <- results[i - 1, 4]
         t_old <- results[i - 1, 1]
@@ -139,7 +142,6 @@ MH_alg <-
           y_0_n = sum(data[date < t_new]$event) - 1
           y_1_n = sum(data[date >= t_new]$event) - 1
           
-          #gibbs step
           lambda_0_old <- results[i - 1, 2]
           lambda_1_old <- results[i - 1, 3]
           lambda_0 <-
@@ -196,14 +198,12 @@ MH_alg <-
           }
         }
       }
+      # Block with t constant
       else{
         t <- results[i - 1, 1]
-        t
         beta_old <- results[i - 1, 4]
-        
         beta_new <-
           rgamma(1, 6, scale = 1 / (lambda_0 + lambda_1 + 1))
-        
         
         y_0 = sum(data[date < results[i - 1, 1]]$event) - 1
         y_1 = sum(data[date >= results[i - 1, 1]]$event) - 1
@@ -214,10 +214,7 @@ MH_alg <-
             rgamma(1, (y_0 + 2), scale = (1 / (t_old - t_0 + 1 / beta_new)))
           lambda_1_n <-
             rgamma(1, (y_1 + 2), scale = (1 / (t_2 - t_old + 1 / beta_new)))
-          lambda_0_n
-          lambda_1_n
-          
-          
+
           lambda_0_old <- results[i - 1, 2]
           lambda_1_old <- results[i - 1, 3]
           
@@ -231,8 +228,6 @@ MH_alg <-
                        t,
                        y_0,
                        y_1)
-          
-          
           
           prop_ratio <-
             f_prop_2(
@@ -318,7 +313,7 @@ q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
 q
 
 ggsave(
-  "block_sim_t_sigma03.pdf",
+  "block_sim_t_sigma10.pdf",
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
   width = 17,
   height = 10,
@@ -375,7 +370,7 @@ q <- q + ggtitle(unname(TeX(c(
 q
 
 ggsave(
-  "block_sim_beta_sigma3.pdf",
+  "block_sim_beta_sigma1.pdf",
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
   width = 17,
   height = 10,
