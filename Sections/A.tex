@@ -273,23 +273,23 @@ which indicates that the estimates for $\lambda_0, \lambda_1$ and $t_1$ are reas
 \begin{figure}[h]
     \centering
     \includegraphics[width = \textwidth]{Images/tuning_stuck_t.pdf}
-    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$}
+    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$.  $\sigma = 1$,  $\sigma= 10$,  $\sigma= 20$}
     \label{fig:tuning_t_single}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width = \textwidth]{Images/tuning.pdf}
-    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$}
-    \label{fig:tuning_t_single}
+    \includegraphics[width = \textwidth]{Images/tuning_t_nice.pdf}
+    \caption{Simulations of $t_1$ with different values for the tuning parameter $\sigma$, for $n = 10000$ samples. Initial values used were $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $t_1 = 1931$. $\sigma = 2$,  $\sigma= 10$,  $\sigma= 20$}
+    \label{fig:tuning_t_single_2}
 \end{figure}
 
-We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  In Figure \ref{fig:tuning_t_single} we used $sigma_1 = 10$, $sigma_2 = 1$ and $sigma_3 = 20$. Here we see that with the smalest $\sigma$ the algorithm gets stuck in a local maximum. The hole density is not explored within this amount of iterations. This again leads to a very large burn-in period. For the larger values of $\sigma$ the convergence seems to happen very fast. 
-
+We have implemented our Markov Chain Monte Carlo algorithm with a tuning parameter $\sigma$. The tuning parameter is the variance for our proposal distribution $Q()$. For our parameter $t$, the tuning parameter will change the acceptance rate of the algorithm. By using a small tuning parameter $\sigma$, the new proposal $t_{new}$ will be similar to the old value $t_{old}$ and the mixing will be slow. When increasing the tuning parameter, the variance in the proposal distribution is increased, and $t_{new}$ will vary more from $t_{old}$. This means that correlation between the samples decreases and the mixing increases. We can adjust the tuning parameter such that we get enough mixing for the algorithm to take large enough steps to explore the target density efficiently, but not so large that the acceptance rate becomes too low. We are looking for an acceptance rate of $20 - 50\%$. In figure \ref{fig:tuning_t_single} we can see how the tuning parameter $\sigma$ affects the simulated samples of $t$.  In Figure \ref{fig:tuning_t_single} we used $sigma_1 = 10$, $sigma_2 = 1$ and $sigma_3 = 20$. Here we see that with the smallest $\sigma$ the algorithm gets stuck in a local maximum. The hole density is not explored within this amount of iterations. This again leads to a very large burn-in period. For the larger values of $\sigma$ the convergence seems to happen very fast. 
+In Figure \ref{fig:tuning_t_single_2} we can see that for a slightly higher low value for $\sigma$ it is stuck in the same way to begin with but converges eventually.
 
 \subsection{Implementing a block Metropolis-Hastings algorithm}
 
-To improve the performance of our Metropolis-Hastings algorithm, we can perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will implement a block Metropolis-Hastings algorithm with two blocks.
+To improve the performance of our Metropolis-Hastings algorithm, we try to perform blocking of the parameters. This means that not all parameters in $\theta$ are treated individually. Grouping together certain parameters in $\theta$ may be useful when they are correlated. We will then compute the acceptance probability, and either update all parameters within the block or none of them. We will implement a block Metropolis-Hastings algorithm with two blocks.
 
 %A block Metropolis-Hastings algorithm for $f(\theta|x)$ can be defined as 
 %skriv noe om Gibbs sampling?
@@ -312,7 +312,7 @@ For the first block proposal, our target distribution is
 We use Metropolis Hastings with a random walk of order one, and the random walk proposal values are generated by firstly generating $\widetilde{t_1}$ from a normal distribution, and then using the value for $\widetilde{t_1}$ when generating ($\widetilde{\lambda_0}$, $\widetilde{\lambda_1}$) from their joint full conditional. This is then used as the proposal function. As we assume $\lambda_0$ and $\lambda_1$ independent, we have that 
 
 \begin{align}
-    Q(\widetilde{t_1}, \lambda_0, \lambda_1 |t) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(\widetilde{t_1}| t) 
+    Q(\widetilde{t_1}, \lambda_0, \lambda_1 |t, x, \beta) = f(\lambda_0| \lambda_1, x, \widetilde{t_1}, \beta)\cdot f(\lambda_1| \lambda_0, x, \widetilde{t_1}, \beta)\cdot f(\widetilde{t_1}| t) 
     %\\
     % = \lambda_0^{y_0 + 1} \cdot \lambda_1^{y_1 + 1} \cdot \text{exp} \Big(  -\lambda_0(\frac{1}{\beta} + \widetilde{t_1} - t_0) - \lambda_1(\frac{1}{\beta} + t_2 - \widetilde{t_1})  \Big)  \nonumber \\ \cdot \frac{1}{\sqrt{2 \pi}\sigma_t } \cdot exp \Big(  -\frac{1}{2} \frac{(\widetilde{t_1}-t_1)^2}{\sigma_t^2} \Big).
 \end{align}
@@ -351,7 +351,7 @@ Again, we choose to have a random walk as our proposal density. Now, we generate
 We again consider $\lambda_0$ and $\lambda_1$ independent, so the joint conditional is just the full conditionals of each multiplied. We can then find an expression for the proposal function,
 
 \begin{align}
-    Q(\widetilde{\beta}, \lambda_0, \lambda_1| \beta) = f(\lambda_0| \lambda_1, x, \widetilde{\beta}, t_1)\cdot f(\lambda_1| \lambda_0, x, \widetilde{\beta}, t_1)\cdot f(\widetilde{\beta}| \beta) 
+    Q(\widetilde{\beta}, \lambda_0, \lambda_1| \beta, t, x) = f(\lambda_0| \lambda_1, x, \widetilde{\beta}, t_1)\cdot f(\lambda_1| \lambda_0, x, \widetilde{\beta}, t_1)\cdot f(\widetilde{\beta}| \beta) 
 \end{align}
 
 
@@ -364,7 +364,7 @@ For the acceptance probability, we then have that
     \alpha = \text{min} \Bigg(1,  \frac{
     f(\beta_{new}, \lambda_{0_{new}}, \lambda_{1_{new}}|t_1, x)}{f(\beta_{old}, \lambda_{0_{old}}, \lambda_{1_{old}}|t_1, x)}
     \cdot 
-    \frac{Q(\beta_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | t_1, x, \beta_{new})}{Q(t_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | t_1, x, \beta_{old})} \Bigg) %\\
+    \frac{Q(\beta_{old}, \lambda_{0_{old}}, \lambda_{0_{old}} | t_1, x, \beta_{new})}{Q(\beta_{new}, \lambda_{0_{new}}, \lambda_{0_{new}} | t_1, x, \beta_{old})} \Bigg) %\\
     % = min \Bigg(1, \frac{ exp \Big( -\lambda_0 \beta_{new} +\lambda_1 \beta_{new}  \Big)}{ exp \Big( -\lambda_0 \beta_{old} +\lambda_1 \beta_{old} \Big)} 
     % \cdot \frac{ exp \Big(  -\lambda_0 \beta_{new} + \lambda_1 \beta_{new}  -\frac{1}{2} \frac{(\widetilde{\beta}_{new}-\beta_{new})^2}{\sigma_{\beta}^2} \Big)}{ exp \Big(  -\lambda_0 \beta_{old}  + \lambda_1 \beta_{old}  -\frac{1}{2} \frac{(\widetilde{\beta}_{old}-\beta_{old})^2}{\sigma_{\beta}^2} \Big)}  \Bigg).
 \end{align}
@@ -490,3 +490,13 @@ We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x]
 \lstinputlisting[language=R, firstline=254, lastline=262]{Code/MH_block.R}
 
 The values obtained are then $\mathbf{E}[t_1|x] = 1891, \mathbf{E}[\lambda_0|x] = 3.381 $ and $\mathbf{E}[\lambda_1|x] = 0.798 $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
+
+
+\todo[color = yellow]{Sett in posterior plotsene de ligger inder images}
+
+\begin{table}[]
+\begin{tabular}{lllll}
+                 & t    & $\lambda_0$ & $\lambda_1$ & $\beta$  \\
+mean single site & 1891 & 3.084     & 0.9256    & 1.003
+\end{tabular}
+\end{table}
