@@ -176,7 +176,7 @@ To evaluate the burn-in period of the algorithm, we have plotted the values of $
 We plotted the parameters separately so they are easier to evaluate. We need to choose a burn-in period for the algorithm equal to the longest burn-in period amongst the parameters. 
 In figure \ref{fig:burnin_lam0} and \ref{fig:burnin_lam1}, we see that the simulations stabilize very quickly, and there is a very small burn-in period for these parameters. 
 %\todo[inline]{burn-in for beta. Den er ikke helt stabil}
-\todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
+%\todo[inline]{Burn-in for t. Ikke helt stabil. Ta med plott fra forskjellige ekstremverdier av t, of forklar hvordan disse ser ut..}
 For the parameter $\beta$, we see that the samples fluctuate, but the mean and variance of the simulations does not seem to change. For the $t_1$-parameter however, we see that the mean slightly changes when the number of iterations increase. This means that we should investigate the burn-in period of this parameter more closely. We do this by running the algorithm for different initial values of $t$, and for different different values for the tuning parameter $\sigma$. In figure \ref{fig:sim_t_diff_start} we see the parameter $t_1$ with $n = 10000$ samples, for three different initial values of $t_1$. 
 
 \todo[]{Disse må kjøres på nytt, eller vent, vi trenger jo ikke disse nå som vi har mixing plottene!!!! :) :) }
@@ -209,34 +209,34 @@ We see in figures \ref{fig:sim_t_diff_start_35} and \ref{fig:sim_t_diff_start_45
 
 % In figure \ref{fig:sim_t_big_n}, we see the simulations of $t_1$ with $n = 50000$ and $n = 100000$ samples. 
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_0.pdf}
-        \caption{$\lambda_0$}
-        \label{fig:}
+        \caption{$\lambda_0$ }
+        \label{fig:sim_mixing_lam0}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_lambda_1.pdf}
         \caption{$\lambda_1$}
-        \label{fig:}
+        \label{fig:sim_mixing_lam1}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_beta.pdf}
         \caption{$\beta$ }
-        \label{fig:}
+        \label{fig:sim_mixing_beta}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width = \textwidth]{Images/mixing_t.pdf}
-        \caption{t}
-        \label{fig:}
+        \caption{$t_1$}
+        \label{fig:sim_mixing_t}
     \end{subfigure}
-    \caption{Traceplot to evaluate mixing }
-    \label{fig:sim_t_big_n}
+    \caption{Plot of three runs of the MCMC algorithm using $n = 10000$ simulations, using three different starting values for $t_1$.They are $t_1 = 1881$, $t_1 = 1901$ and $t = 1931$ The tuning parameter is set to $\sigma = 3$. The starting values for the other parameters are $\lambda_0 = 10, \lambda_1 = 5$ and $\beta = 3$}
+    \label{fig:sim_mixing}
 \end{figure}
 
 % We see that the simulations of $t_1$ in figure \ref{fig:sim_t_big_n} 
@@ -244,22 +244,16 @@ We see in figures \ref{fig:sim_t_diff_start_35} and \ref{fig:sim_t_diff_start_45
 %\todo[inline]{separate into two areas and calculate the statistics for the areas to evaluate if we have chosen an okay estimate for the burn-in period.}
 
 
-
-
 %mixing
-\todo[color = yellow]{Dette er forsåvidt rett men ha også med et plott med to forskjellig kjeder og se hvordan de mikser}
-To evaluate the mixing properties of our algorithm, we plot two simulations of our MCMC algorithm, using two different starting values for our parameters $\lambda_0, \lambda_1, \beta$ and $t_1$. As there was no burn-in period for $\lambda_0, \lambda_1$ and $\beta$, the different simulations are not very interesting, and we did not include them. For $t_1$ however, we saw in figure \ref{fig:burnin_singleMH} and figure \ref{fig:sim_t_diff_start} that there was a clear burn-in period. We therefore expect the simulations using different stating values to start off quite different, but to converge to the same stationary state after the burn-in period. The plot of two simulations with starting values $t = 1896$ and $t = 1931$ respectively can be seen in figure \ref{fig:sim_mixing_t}.
+%\todo[color = yellow]{Dette er forsåvidt rett men ha også med et plott med to forskjellig kjeder og se hvordan de mikser}
 
-\begin{figure}
-    \centering
-    \includegraphics[width = \textwidth]{Images/mixing_.pdf}
-    \caption{Plot of two runs of the MCMC algorithm using $n = 10000$ simulations, for starting values $t = 1896$ and $t = 1931$. The starting values for the other parameters and the tuning parameter $\sigma$ are held constant at $\lambda_0 = 10, \lambda_1 = 5, \beta = 3$ and $\sigma = 3$}
-    \label{fig:sim_mixing_t}
-\end{figure}
+To evaluate the mixing properties of our algorithm, we plot three simulations of our MCMC algorithm, using three different starting values for our parameter $t_1$. As there was no burn-in period for $\lambda_0, \lambda_1$ and $\beta$, the different simulations very similar. For $t_1$ however, we saw in figure \ref{fig:burnin_singleMH} and figure \ref{fig:sim_t_diff_start} that there was a clear burn-in period. We therefore expect the simulations using different stating values to start off quite different, but to converge to the same stationary state after the burn-in period. The plot of the mixing for all parameters can be seen in figure \ref{fig:sim_mixing}. We see in figure \ref{fig:sim_mixing_t} that the plots with different starting values of $t_1$ converges quite quickly, and can therefore assume that the mixing is fast. 
+
+
 
 To further investigate the mixing properties of $t_1$, we plotted the autocorrelation function for $t_1$ after the initial burn-in period, which we have set to be $b = 500$ iterations. The autocorrelation plot is shown in figure \ref{fig:acf_t}. From the plot we see that the correlation decreases between the samples as the distance increases, and after $lag = 20$, there is no significant autocorrelation between the drawn samples. This indicates that correlation between the samples decrease fast enough for the algorithm to explore the density properly. 
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[width = \textwidth]{Images/acf_t_10000.pdf}
     \caption{Autocorrelation function of $t_1$ for different $lag$. }
@@ -506,11 +500,10 @@ The different block proposals does not run completely independently of each othe
 \todo[inline]{snakk noe om burn-in-periode.}
 
 \todo[inline]{Fra oppgaven: Use the simulation
-results to estimate the marginal posterior distributions f(t1|x), f(⁄0|x), f(⁄1|x) and f(—|x).
-Use also the simulated values to estimate E[t1|x], E[⁄0|x], E[⁄1|x] and Cov[⁄0,⁄1|x]. Dette må plottes, eller er det noe vi har plottet? }
+results to estimate the marginal posterior distributions f(t1|x), f(⁄0|x), f(⁄1|x) and f(—|x). Cov[lambda0,lanbda1|x]. Dette må plottes, eller er det noe vi har plottet? Og hva er kovariansen, har vi ikke antatt disse uanvhengig?}
 
-We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x], \mathbf{E}[\lambda_0|x]$ and $\mathbf{E}[\lambda_0|x]$. We do this by removing the burn-in period, and then finding the empirical means. 
+We can use the simulated values of the parameters to estimate $\mathbf{E}[t_1|x], \mathbf{E}[\lambda_0|x]$ and $\mathbf{E}[\lambda_1|x]$. We do this by removing the burn-in period, and then finding the empirical means. 
 
 \lstinputlisting[language=R, firstline=254, lastline=262]{Code/MH_block.R}
 
-The values obtained are then $\mathbf{E}[t_1|x] = , \mathbf{E}[\lambda_0|x] = $ and $\mathbf{E}[\lambda_0|x] = $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
+The values obtained are then $\mathbf{E}[t_1|x] = 1891, \mathbf{E}[\lambda_0|x] = 3.381 $ and $\mathbf{E}[\lambda_1|x] = 0.798 $. This is similar to the values obtained with the single site Metropolis Hastings algorithm. 
