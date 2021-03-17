@@ -20,9 +20,8 @@ MH_single_alg <-
            lambda_1,
            beta,
            sigma) {
-    # Find number of deaths in each interval given initial t
-    # y_0 = sum(data[date <t]$event)
-    # y_1 = sum(data[date>= t]$event)
+    # Find number of deaths in each interval given initial t substract one to
+    # adjust for h data stat and end date{}
     y_0 = sum(data[date < t]$event) - 1
     y_1 = sum(data[date >= t]$event) - 1
     
@@ -117,7 +116,9 @@ ggsave(
 )
 
 # Initial values for t, lambda_0, lambda_1, beta
-t = data[1, date] + 50
+t_1_1 = data[1, date] + 50
+t_1_2 = data[1, date] + 10
+t_1_3 = data[1, date] + 80
 lambda_0 <- 10
 lambda_1 <- 5
 beta = 3
@@ -127,13 +128,12 @@ beta = 3
 n = 10000
 t_0 = data[1, date]
 t_2 = data[nrow(data), date] #maybe should be 1963?
-sigma = 3
+sigma = 10
 
-t_2
 
 # Run algorithm
 sim_MH_single <-
-  MH_single_alg(n, data, t_0, t_2, t, lambda_0, lambda_1, beta, sigma)
+  MH_single_alg(n, data, t_0, t_2, t_1_1, lambda_0, lambda_1, beta, sigma)
 
 #Format and plot the results
 sim_MH_single <- as.data.table(sim_MH_single)
@@ -199,11 +199,11 @@ q <- q + geom_line(aes(y = t, colour = "t"))
 q <- q +  theme(legend.position = "none")
 q <- q + ylab("t")
 q <- q + xlab("Iteration")
-q <- q + ggtitle(unname(TeX(c("Traceplot for t"))))
+q <- q + ggtitle(unname(TeX(c("Traceplot for t with initital value t = 1860"))))
 q
 
 ggsave(
-  "sim_t.pdf",
+  "sim_t_1_2.pdf",
   path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
   width = 17,
   height = 10,
@@ -212,28 +212,36 @@ ggsave(
 
 
 #mixing of the MH-algorithm
-t_alt_1 = data[1, date] + 70
-t_alt_2 = data[1, date] + 30
+# t_alt_1 = data[1, date] + 70
+# t_alt_2 = data[1, date] + 30
 
-sim_MH_single_alt_1 <-
-  MH_single_alg(n, data, t_0, t_2, t_alt_1, lambda_0, lambda_1, beta, sigma)
-sim_MH_single_alt_2 <-
-  MH_single_alg(n, data, t_0, t_2, t_alt_2, lambda_0, lambda_1, beta, sigma)
+n = 10000
+sigma = 10
+sim_MH_single_1 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_1, lambda_0, lambda_1, beta, sigma)
+sim_MH_single_2 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_2, lambda_0, lambda_1, beta, sigma)
+sim_MH_single_3 <-
+  MH_single_alg(n, data, t_0, t_2, t_1_3, lambda_0, lambda_1, beta, sigma)
 
-sim_MH_single_alt_1 <- as.data.table(sim_MH_single_alt_1)
-sim_MH_single_alt_2 <- as.data.table(sim_MH_single_alt_2)
-setnames(sim_MH_single_alt_1,
+sim_MH_single_1 <- as.data.table(sim_MH_single_1)
+sim_MH_single_2 <- as.data.table(sim_MH_single_2)
+sim_MH_single_3 <- as.data.table(sim_MH_single_3)
+setnames(sim_MH_single_1,
          c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
-setnames(sim_MH_single_alt_2,
+setnames(sim_MH_single_2,
          c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
-sim_MH_single_alt_1[, iteration := seq(1:n)]
-sim_MH_single_alt_2[, iteration := seq(1:n)]
+setnames(sim_MH_single_3,
+         c("t_alt", "lambda_0", "lambda_1", "beta", "a"))
+sim_MH_single_1[, iteration := seq(1:n)]
+sim_MH_single_2[, iteration := seq(1:n)]
+sim_MH_single_3[, iteration := seq(1:n)]
 
-sim_MH_single[, run := 1]
-sim_MH_single_alt_1[, run := 2]
-sim_MH_single_alt_2[, run := 3]
+sim_MH_single_1[, run := 1]
+sim_MH_single_2[, run := 2]
+sim_MH_single_3[, run := 3]
 sim_MH_single_compare <-
-  rbindlist(list(sim_MH_single, sim_MH_single_alt_1, sim_MH_single_alt_2))
+  rbindlist(list(sim_MH_single_1, sim_MH_single_2, sim_MH_single_3))
 
 #[iteration <2600 & iteration >2400 ]
 q <-
@@ -245,7 +253,7 @@ q <-
       colour = as.factor(run)
     )
   )
-q <- q + geom_line(aes(y = t))
+q <- q + geom_line(aes(y = t_alt))
 q <- q +  theme(legend.position = "none")
 q <- q + ylab("t")
 q <- q + xlab("Iteration")
