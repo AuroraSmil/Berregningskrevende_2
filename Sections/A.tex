@@ -558,9 +558,6 @@ We see from Table \ref{tab:mean} that the means using single site and block upda
 From Table \ref{tab:cov} we see that the covariance is lower in the single site update than in the block update. A reason for this could be that the block update updates or rejects $\lambda_0$ and $\lambda_1$ at the same time together with either $t$ or $\beta$. This could mean that only "good" combinations of $\lambda_0$ and $\lambda_1$ are accepted. 
 
 
-\todo[color = yellow]{Sett in posterior plotsene de ligger inder images. Prøv å lag fire plott med posterio til t for single og block ved siden av hverandre etc.. }
-
-\todo[inline]{kjøre plottene på nytt med faste akser, slik at de er lettere å sammenligne. Bare hvis det er tid.}
 
 
 \begin{figure}[H]
@@ -639,7 +636,9 @@ From Table \ref{tab:cov} we see that the covariance is lower in the single site 
 \end{figure}
 
 
-We see from figures \ref{fig:post_t}, \ref{fig:post_beta}, \ref{fig:burnin_lam0} and \ref{fig:post_lam1} that the overall shape of the posterior densities look quite similar when using the single site versus the block updating. This is consistent with the estimates shown in table \ref{tab:mean}, showing that the estimated parameters were similar for the single site and the block update. 
+We see from figures \ref{fig:post_t}, \ref{fig:post_beta}, \ref{fig:post_lam0} and \ref{fig:post_lam1} that the overall shape of the posterior densities look quite similar when using the single site versus the block updating. This is consistent with the estimates shown in table \ref{tab:mean}, showing that the estimated parameters were similar for the single site and the block update. The variance does however seem to overall higher for all parameters estimated using the Metropolis Hastings with block update. Why this is, we are not sure. 
+
+\todo[inline]{Vet du hvorfor variansen kan være høyere med block? hvis ikke, så skriver vi ikke noe om det. }
 
 
 
