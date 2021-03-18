@@ -547,21 +547,99 @@ We see from Table \ref{tab:mean} that the means using single site and block upda
 \begin{table}[]
 \centering
 \begin{tabular}{lc}
-                      & \textbf{Cov($\lambda_1$, $\lambda_0$)} \\ \hline
+                      & \textbf{Cov($\lambda_1$, $\lambda_0|x$)} \\ \hline
 \textbf{Single site}  & 0.00199                            \\
 \textbf{Block update} & 0.01475                           
 \end{tabular}
-\caption{...}
+\caption{Estimate for \textbf{Cov($\lambda_0, \lambda_1|x$)} using the single site and the block update.}
 \label{tab:cov}
 \end{table}
 
-From Table \ref{tab:cov} we see that the covariance is lower in the single site update than in the block update. This could be because in the block update either both are updated together with t or all rejected. This could mean that only "good" combinations of $\lambda_0$ and $\lambda_1$ are accepted. 
+From Table \ref{tab:cov} we see that the covariance is lower in the single site update than in the block update. A reason for this could be that the block update updates or rejects $\lambda_0$ and $\lambda_1$ at the same time together with either $t$ or $\beta$. This could mean that only "good" combinations of $\lambda_0$ and $\lambda_1$ are accepted. 
 
 
 \todo[color = yellow]{Sett in posterior plotsene de ligger inder images. Prøv å lag fire plott med posterio til t for single og block ved siden av hverandre etc.. }
 
+\todo[inline]{kjøre plottene på nytt med faste akser, slik at de er lettere å sammenligne. Bare hvis det er tid.}
 
-We see that the posterior densities look quite similar when using the single site versus the block updating. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_t_single.pdf}
+        \caption{Single site update}
+        \label{fig:post_t_single}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_t_block.pdf}
+        \caption{Block update}
+        \label{fig:post_t_block}
+    \end{subfigure}
+     \caption{Estimated marginal posterior distributions of $t_1$, $f(t_1|x)$, using the single site and the block Metropolis Hastings algorithm.}
+    \label{fig:post_t}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_beta_single.pdf}
+        \caption{Single site update}
+        \label{fig:post_beta_single}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_beta_block.pdf}
+        \caption{Block update}
+        \label{fig:post_beta_block}
+    \end{subfigure}
+     \caption{Estimated marginal posterior distributions of $\beta$, $f(\beta|x)$, using the single site and the block Metropolis Hastings algorithm.}
+    \label{fig:post_beta}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_lambda_0_single.pdf}
+        \caption{Single site update}
+        \label{fig:post_lambda_0_single}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_lambda_0_block.pdf}
+        \caption{Block update}
+        \label{fig:post_lambda_0_block}
+    \end{subfigure}
+     \caption{Estimated marginal posterior distributions of $\lambda_0$, $f(\lambda_1|x)$, using the single site and the block Metropolis Hastings algorithm.}
+    \label{fig:post_lam0}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_lambda_1_single.pdf}
+        \caption{Single site update}
+        \label{fig:post_lambda_1_single}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{Images/post_lambda_1_block.pdf}
+        \caption{Block update}
+        \label{fig:post_lambda_1_block}
+    \end{subfigure}
+     \caption{Estimated marginal posterior distributions of $\lambda_1$, $f(\lambda_1|x)$, using the single site and the block Metropolis Hastings algorithm.}
+    \label{fig:post_lam1}
+\end{figure}
+
+
+We see from figures \ref{fig:post_t}, \ref{fig:post_beta}, \ref{fig:burnin_lam0} and \ref{fig:post_lam1} that the overall shape of the posterior densities look quite similar when using the single site versus the block updating. This is consistent with the estimates shown in table \ref{tab:mean}, showing that the estimated parameters were similar for the single site and the block update. 
 
 
 
