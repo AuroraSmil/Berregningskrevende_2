@@ -1,5 +1,5 @@
 \section{INLA for Gaussian Data}
-In this section we will look at the smoothing of a time series and how to use integrated nested Laplace approximations which we from here on will refer to as INLA.
+In this section we will look at the smoothing of a given time series and how to use integrated nested Laplace approximations. We will refer to the integrated nested Laplace approximations as INLA from now on.
 
 \subsection{Data exploring}
  
@@ -10,17 +10,17 @@ In this section we will look at the smoothing of a time series and how to use in
     \label{fig:gaussian_data}
 \end{figure}
 
-In Figure \ref{fig:gaussian_data} vi can see the Gaussian data we want to find the underlying distribution of. We note that it looks like some of the previous values influence the next value in the time series. From the provided data, we have observations for $t = 1,...,20$, and this is what we will be using for the duration of this problem. 
+In Figure \ref{fig:gaussian_data} vi can see the time series of Gaussian data we want to find the underlying distribution of. We note that it looks like some of the previous values influence the next value in the time series. From the provided data, we have observations for $t = 1,...,20$, and this is what we will be using for the duration of this problem. 
 
 
 \subsection{Latent Gaussian model}
 
-As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_{20})$ the observations $y_k$ are independent and normally distributed, having mean $\eta_t$ and variance $1$,  $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,20$. $\eta_t$ is a smooth effect of time which the linear predictor is linked to, $\eta_t = f_t$. 
+As given in the problem text, we assume that given the vector $\eta = (\eta_1...\eta_{20})$ the observations $y_k$ are independent and normally distributed, having mean $\eta_t$ and variance $1$,  $y_t|\eta_t = \mathcal{N}(\eta_t, 1); t = 1,...,20$. $\eta_t$ is linked to a smooth effect of time, $\eta_t = f_t$. 
 
 We are implementing a second order Random Walk model as the prior distribution for the vector \textbf{f} $= (f_1,...,f_{20})$ to model the temporal effects of the covariates. As $\eta_t = f_t$, we have that 
 
 \begin{align} \label{RW_prior}
-    \pi(\mathbf{f}|\theta) = \pi(\mathbf{\eta}|\theta) \propto
+    \pi(\mathbf{f}|\theta) = \pi(\mathbf{ \eta}|\theta) \propto
     \theta^{(T-2/2)} \text{exp} \Bigg\{  -\frac{\theta}{2} \sum_{t = 3}^{20} (f_t - 2f_{t-1} + f_{t-2})^2  \Bigg\} = \mathcal{N}(\mathbf{0}, \mathbf{Q}(\theta)^{-1}).
 \end{align}
 
@@ -45,9 +45,9 @@ To find the precision matrix for our model, we expand the expression for $\textb
 
 This is a sparse matrix. 
 
-In total we have a model where all latent variables are Gaussian. We also have that they are all conditionally independent resulting in a sparse precision matrix implieing the latent field is a Gaussian Markov Random Field (GMRF). 
+In total we have a model where all latent variables are Gaussian. We also have that they are all conditionally independent resulting in a sparse precision matrix implying the latent field is a Gaussian Markov Random Field (GMRF). 
 
-The set of hyper parameters consists only of $\theta$ which has the gamma(1,1) prior. This means the set of hyper parameters are small and we fulfill all requirements to use INLA.
+The set of hyperparameters consists only of $\theta$ which has the gamma(1,1) prior. This means the set of hyperparameters are small and we fulfill all requirements to use INLA.
 
 The resulting joint distribution of $y$, $\eta$ and $\theta$ is  $ \pi(y, \eta, \theta )= \pi(y|\eta) \cdot \pi(\eta|\theta) \cdot \pi(\theta)$ where $\pi(y|\eta)$, $\pi(\eta|\theta)$ and $\pi(\theta)$ are as given above.
 
@@ -154,7 +154,7 @@ We also need to find $\pi(\theta, \eta)$. This is given by
 
 Lastly we need $\pi(\eta| \theta \boldsymbol{y})$ which we calculated in part \ref{Gibbs} to be a gamma distribution with rate, $\alpha = \frac{T}{2}$ and scale parameter $\beta = 1/(\frac{1}{2}\cdot (1 + \eta^T Q \eta))$.
 
-We construct a grid for values of $\theta$, and then choose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
+%We construct a grid for values of $\theta$, and then choose an $\eta$ at random since this should be true for all $\eta$ and compute all the elements mentioned above.  
 
 We construct a grid for values of $\theta$, and choose an $\eta$ at random. This can be done because expression \eqref{post_theta} should be true for all values of $\eta$. Then, we compute all the elements mentioned above.  
 
