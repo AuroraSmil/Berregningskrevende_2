@@ -510,7 +510,9 @@ cov <- cov(sim_MH_single[2000:nrow(sim_MH_single),lambda_1], sim_MH_single[2000:
 sum[4,]
 
 q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = t))
-q <- q + geom_histogram(aes(y = ..density..), bins = 150)
+q <- q + geom_histogram(aes(y = ..density..), bins = 150) 
+q <- q + scale_x_continuous( limits = c(1880,1900))
+q <- q + scale_y_continuous( limits = c(0,0.6))
 q <- q + xlab(unname(TeX(c("$t$"))))
 q <- q + ylab("Density")
 q <- q + ggtitle(unname(TeX("Posterior density of $t$")))
@@ -519,7 +521,7 @@ q
 
 ggsave(
   "post_t_single.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
@@ -528,13 +530,15 @@ ggsave(
 q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = beta))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q <- q + xlab(unname(TeX(c("$\\beta$"))))
+q <- q + scale_x_continuous( limits = c(0,4))
+q <- q + scale_y_continuous( limits = c(0,1.5))
 q <- q + ylab("Density")
 q <- q + ggtitle(unname(TeX("Posterior density of $\\beta$")))
 q
 
 ggsave(
   "post_beta_single.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
@@ -544,26 +548,30 @@ q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = lambda_0))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q <- q + xlab(unname(TeX(c("$\\lambda_0$"))))
 q <- q + ylab("Density")
+q <- q + scale_x_continuous( limits = c(1,5))
+#q <- q + scale_y_continuous( limits = c(0,1.3))
 q <- q + ggtitle(unname(TeX("Posterior density of $\\lambda_0$")))
 q
 ggsave(
   "post_lambda_0_single.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
 )
 
-q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = lambda_0))
+q <- ggplot(data = sim_MH_single[2000:nrow(sim_MH_single),], aes(x = lambda_1))
 q <- q + geom_histogram(aes(y = ..density..), bins = 100)
 q <- q + xlab(unname(TeX(c("$\\lambda_1$"))))
 q <- q + ylab("Density")
+q <- q + scale_x_continuous( limits = c(0,2))
+#q <- q + scale_y_continuous( limits = c(0,2))
 q <- q + ggtitle(unname(TeX("Posterior density of $\\lambda_1$")))
 q
 
 ggsave(
   "post_lambda_1_single.pdf",
-  path = "/Users/aurorahofman/Documents/NTNU/5 klasse/Beregningskrevende statistikk/Berregningskrevende_2/Images",
+  path = "C:\\Users\\sara_\\OneDrive\\Documents\\NTNU\\10.Semester\\Beregningskrevende\\Prosjekt1\\Berregningskrevende_2\\Images",
   width = 17,
   height = 10,
   units = "cm"
