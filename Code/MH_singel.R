@@ -355,7 +355,7 @@ q
 
 burnin <- 500
 
-sim_t <- sim_MH_single_1$t[burnin:n]
+sim_t <- sim_MH_single$t[burnin:n]
 
 acf(sim_t)
 
